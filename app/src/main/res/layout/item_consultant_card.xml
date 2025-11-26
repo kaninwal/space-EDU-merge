@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Profile Image -->
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="#F0F0F0"
+                android:src="@drawable/default_profilepic"
+                android:scaleType="centerCrop" />
+
+            <!-- Basic Info -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Full Name : Utkarsh"
+                    android:textColor="#333333"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Category : Pediatrician"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Office : India"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Language : Hindi"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Detailed Grid Info -->
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:columnCount="2">
+
+            <!-- Available From -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:text="Available\n(from)Time : 13:00:00"
+                android:textColor="#333333"
+                android:textSize="11sp" />
+
+            <!-- Available To -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:text="Available\n(to)Time : 17:00:00"
+                android:textColor="#333333"
+                android:textSize="11sp" />
+
+            <!-- Fees -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:layout_marginTop="8dp"
+                android:text="Consultant\nfees : 45"
+                android:textColor="#333333"
+                android:textSize="11sp" />
+
+            <!-- Days -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:layout_marginTop="8dp"
+                android:text="Available\ndays : Sunday"
+                android:textColor="#333333"
+                android:textSize="11sp" />
+
+            <!-- Qualification -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:layout_marginTop="8dp"
+                android:text="Qualification : MD"
+                android:textColor="#333333"
+                android:textSize="11sp" />
+
+        </GridLayout>
+
+        <!-- Action Button -->
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#03A9F4"
+            android:text="Book\nAppointment"
+            android:textSize="10sp"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
