@@ -1,9 +1,369 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:background="@color/Spacece_Yellow">
-</androidx.constraintlayout.widget.ConstraintLayout>
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="30dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/logo" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="Spaces Web Portal"
+                android:textColor="#333333"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center">
+
+                <View
+                    android:layout_width="18dp"
+                    android:layout_height="14dp"
+                    android:background="@drawable/ic_menu_library" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Page Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_tab_unselected"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="8dp"
+                android:text="Child Profile"
+                android:textColor="#FFA500"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Profile Image Placeholder -->
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:background="#E0E0E0"
+                android:scaleType="centerCrop" />
+
+            <!-- Child's Name -->
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Child Name" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="Child 1" />
+
+            <!-- Child's DOB -->
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Child Date Of Birth" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="12/07/2012"
+                android:inputType="date" />
+
+            <!-- Child's School -->
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Child School" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="Filed Entry" />
+
+            <!-- Image Upload -->
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Image" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    style="@style/ProfileInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:hint="Filed Entry" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:backgroundTint="#FFFFFF"
+                    android:text="Upload"
+                    android:textColor="#333333"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Buttons Top -->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="#4FC3F7"
+                android:text="Book Pediatrician"
+                android:textColor="@color/white" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#4FC3F7"
+                android:text="Your Appointments"
+                android:textColor="@color/white" />
+
+            <!-- Health Updates Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="Current Health\nUpdates"
+                android:textColor="#333333"
+                android:textSize="22sp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#FFA500"
+                android:text="Options"
+                android:textSize="12sp" />
+
+            <!-- Next Immunization -->
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Next Immunization" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="Vaccine Name" />
+
+            <!-- Vaccine Appt Date -->
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Vaccine Appointment Date" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="10 / 12 / 2025" />
+
+            <!-- Previous Immunization -->
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Previous Immunization" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="10 / 1 / 2025" />
+
+            <!-- Disease -->
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Disease Being Immunized For" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="Disease Name" />
+
+            <!-- Age -->
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Child's Age Upon Administering" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="5 Years" />
+
+            <!-- Status -->
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Status Of All Immunizations" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="Incomplete"
+                android:textColor="#FFD700"
+                android:textStyle="bold" />
+
+            <!-- Buttons Middle -->
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="#F44336"
+                android:text="Book Pediatrician"
+                android:textColor="@color/white" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#4FC3F7"
+                android:text="Your Appointments"
+                android:textColor="@color/white" />
+
+            <!-- Height Chart -->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="30dp"
+                android:background="#E0E0E0"
+                android:scaleType="fitCenter"
+                android:src="@android:drawable/ic_menu_gallery" />
+
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Last Height Measurement" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="110 cm" />
+
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Status" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="Healthy"
+                android:textColor="#4CAF50"
+                android:textStyle="bold" />
+
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Average Height For This Age - Male" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="108 cm" />
+
+            <!-- Weight Chart -->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="30dp"
+                android:background="#E0E0E0"
+                android:scaleType="fitCenter"
+                android:src="@android:drawable/ic_menu_gallery" />
+
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Last Weight Measurement" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="14 kgs" />
+
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Status" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="Healthy"
+                android:textColor="#4CAF50"
+                android:textStyle="bold" />
+
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="Average Weight For This Age - Male" />
+
+            <EditText
+                style="@style/ProfileInput"
+                android:hint="14 kgs" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="104dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp">
+
+            <View
+                android:id="@+id/ellipse_i_login"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/logo"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="100dp"
+                android:text="Still delaying treatment for your child's health concerns"
+                android:textColor="#F8A800"
+                android:textSize="16sp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="100dp"
+                android:layout_marginTop="56dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/CantactUs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Contact us"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/ArrowDown"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="190dp"
+                    android:background="@android:color/transparent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/arrowdown"
+                    android:tint="@color/black" />
+            </LinearLayout>
+        </FrameLayout>
+
+    </LinearLayout>
+</ScrollView>
