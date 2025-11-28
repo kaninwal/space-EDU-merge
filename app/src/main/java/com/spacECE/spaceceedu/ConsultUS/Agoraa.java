@@ -20,10 +20,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.spacECE.spaceceedu.MainActivity;
 import com.spacECE.spaceceedu.R;
-import io.agora.rtc.IRtcEngineEventHandler;
-import io.agora.rtc.RtcEngine;
-import io.agora.rtc.video.VideoCanvas;
-import io.agora.rtc.video.VideoEncoderConfiguration;
+import io.agora.rtc2.IRtcEngineEventHandler;
+import io.agora.rtc2.RtcEngine;
+import io.agora.rtc2.video.VideoCanvas;
+import io.agora.rtc2.video.VideoEncoderConfiguration;
+import io.agora.rtc2.ChannelMediaOptions;
+import io.agora.rtc2.RtcEngineConfig;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -155,7 +157,7 @@ public class Agoraa extends AppCompatActivity {
           The video display view must be created using this method instead of directly
           calling SurfaceView.
          */
-        SurfaceView view = RtcEngine.CreateRendererView(getBaseContext());
+        SurfaceView view = new SurfaceView(getBaseContext());
         view.setZOrderMediaOverlay(parent == mLocalContainer);
         parent.addView(view);
         mRemoteVideo = new VideoCanvas(view, VideoCanvas.RENDER_MODE_HIDDEN, uid);
@@ -313,7 +315,11 @@ public class Agoraa extends AppCompatActivity {
 
     private void initializeEngine() {
         try {
-            mRtcEngine = RtcEngine.create(getBaseContext(), getString(R.string.agora_app_id), mRtcEventHandler);
+            RtcEngineConfig config = new RtcEngineConfig();
+            config.mContext = getBaseContext();
+            config.mAppId = getString(R.string.agora_app_id);
+            config.mEventHandler = mRtcEventHandler;
+            mRtcEngine = RtcEngine.create(config);
         } catch (Exception e) {
             Log.e(TAG, Log.getStackTraceString(e));
             throw new RuntimeException("NEED TO check rtc sdk init fatal error\n" + Log.getStackTraceString(e));
@@ -327,7 +333,7 @@ public class Agoraa extends AppCompatActivity {
         mRtcEngine.enableVideo();
 
         // Please go to this page for detailed explanation
-        // https://docs.agora.io/en/Video/API%20Reference/java/classio_1_1agora_1_1rtc_1_1_rtc_engine.html#af5f4de754e2c1f493096641c5c5c1d8f
+        // https://docs.agora.io/en/Video/API%20Reference/java/classio_1_1agora_1_1rtc_1_1_rtc_engine.html#af5f4de754e2c1f493096641c5c1d8f
         mRtcEngine.setVideoEncoderConfiguration(new VideoEncoderConfiguration(
                 VideoEncoderConfiguration.VD_640x360,
                 VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_15,
@@ -343,7 +349,7 @@ public class Agoraa extends AppCompatActivity {
         // Our server will assign one and return the uid via the event
         // handler callback function (onJoinChannelSuccess) after
         // joining the channel successfully.
-        SurfaceView view = RtcEngine.CreateRendererView(getBaseContext());
+        SurfaceView view = new SurfaceView(getBaseContext());
         view.setZOrderMediaOverlay(true);
         mLocalContainer.addView(view);
         // Initializes the local video view.
@@ -357,11 +363,11 @@ public class Agoraa extends AppCompatActivity {
         // same channel successfully using the same app id.
         // 2. One token is only valid for the channel name that
         // you use to generate this token.
-
-
-
-        mRtcEngine.joinChannel(token, channel, "Extra Optional Data", 0);
-
+        ChannelMediaOptions options = new ChannelMediaOptions();
+        options.autoSubscribeAudio = true;
+        options.autoSubscribeVideo = true;
+        options.clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER;
+        mRtcEngine.joinChannel(token, channel, 0, options);
     }
 
     @Override

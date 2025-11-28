@@ -23,6 +23,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/text_activity_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Activity ID : 100"
@@ -30,6 +31,7 @@
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/text_activity_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -38,6 +40,7 @@
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/text_activity_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -46,6 +49,7 @@
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/text_activity_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -54,6 +58,7 @@
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/text_activity_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -73,7 +78,6 @@
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="12sp"
-            app:icon="@drawable/ic_baseline_filter_list_24"
             app:iconGravity="end"
             app:iconSize="12dp"
             app:iconTint="#FFFFFF"

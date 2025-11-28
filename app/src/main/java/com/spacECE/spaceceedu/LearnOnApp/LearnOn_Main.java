@@ -44,19 +44,15 @@ public class LearnOn_Main extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
-
-                    case R.id.allCourse:
+                int itemId = item.getItemId();
+                if (itemId == R.id.allCourse) {
 //                          You Just Attach Here Fragment Manager Here Of All Course
 //                            getSupportFragmentManager().beginTransaction().replace(R.id.LearnOnMain_Frame, fragment).commit();
-                            Toast.makeText(getApplicationContext(), "All Course", Toast.LENGTH_SHORT).show();
-                            break;
-
-                    case R.id.myCourse:
+                    Toast.makeText(getApplicationContext(), "All Course", Toast.LENGTH_SHORT).show();
+                } else if (itemId == R.id.myCourse) {
 //                          You just Attach Here Fragment Manager Here Of My Course
 //                            getSupportFragmentManager().beginTransaction().replace(R.id.LearnOnMain_Frame, fragment).commit();
-                            Toast.makeText(getApplicationContext(), "My Course", Toast.LENGTH_SHORT).show();
-                            break;
+                    Toast.makeText(getApplicationContext(), "My Course", Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }

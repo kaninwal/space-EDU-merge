@@ -4,12 +4,13 @@ plugins {
 }
 
 android {
-    compileSdk 30
+    namespace 'com.spacECE.spaceceedu'
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.spacECE.spaceceedu"
         minSdk 23
-        targetSdk 30
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -20,6 +21,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
@@ -52,8 +54,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5'
-    implementation 'com.synnapps:carouselview:0.1.5'
+    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0'
+    implementation 'me.relex:circleindicator:2.1.6'
+    implementation 'org.imaginativeworld.whynotimagecarousel:whynotimagecarousel:2.1.0'
     implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
 
     //
@@ -61,10 +64,10 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     //mojo
-    implementation 'com.instamojo:android-sdk:3.5.0'
+    // implementation 'com.instamojo:android-sdk:3.7.1'
 
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
 
-    implementation 'io.agora.rtc:full-sdk:3.2.1'
+    implementation 'io.agora.rtc:full-sdk:4.2.1'
 
 }

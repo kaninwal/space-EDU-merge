@@ -32,18 +32,19 @@ public class VideoLibrary_Activity extends AppCompatActivity {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     Fragment selectedFragment = null;
-                    switch (item.getItemId()) {
-                        case R.id.videolibrary_nav_free:
-                            selectedFragment = new VideoLibrary_Free();
-                            break;
-                        case R.id.videolibrary_nav_paid:
-                            selectedFragment = new VideoLibrary_Premium();
-                            break;
-                        case R.id.videolibrary_nav_trending:
-                            selectedFragment = new VideoLibrary_trending_Fragment();
+                    int itemId = item.getItemId();
+                    if (itemId == R.id.videolibrary_nav_free) {
+                        selectedFragment = new VideoLibrary_Free();
+                    } else if (itemId == R.id.videolibrary_nav_paid) {
+                        selectedFragment = new VideoLibrary_Premium();
+                    } else if (itemId == R.id.videolibrary_nav_trending) {
+                        selectedFragment = new VideoLibrary_trending_Fragment();
                     }
-                    getSupportFragmentManager().beginTransaction().replace(R.id.VideoLibrary_Fragment_layout,
-                            selectedFragment).commit();
+                    
+                    if (selectedFragment != null) {
+                        getSupportFragmentManager().beginTransaction().replace(R.id.VideoLibrary_Fragment_layout,
+                                selectedFragment).commit();
+                    }
                     return true;
                 }
             };

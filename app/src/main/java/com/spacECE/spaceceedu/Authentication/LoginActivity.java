@@ -29,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView tv_register;
     TextView tv_invalid;
     ToggleButton is_Consultant;
+    TextView tv_forgotPassword;
 
     String USER;
 
@@ -50,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
         tv_register = findViewById(R.id.TextView_Register);
         tv_invalid = findViewById(R.id.TextView_InvalidCredentials);
         is_Consultant = findViewById(R.id.isConsultant);
+        tv_forgotPassword = findViewById(R.id.TextView_ForgotPassword);
 
 
 
@@ -65,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(is_Consultant.isChecked()){
+                if(is_Consultant != null && is_Consultant.isChecked()){
                     USER = "consultant";
                 } else {
                     USER = "customer";
@@ -79,6 +81,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(),RegistrationSelection.class));
+            }
+        });
+
+        tv_forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                 // Implement forgot password functionality or navigation here
+                 Toast.makeText(LoginActivity.this, "Forgot Password Clicked", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -184,4 +194,3 @@ public class LoginActivity extends AppCompatActivity {
         }).start();
     }
 }
-

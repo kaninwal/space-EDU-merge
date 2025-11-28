@@ -54,22 +54,21 @@ public class Library_main extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.menuBook:
-                        startActivity(new Intent(getApplicationContext(),library_my_books.class));
-                        overridePendingTransition(0,0);
-                        return true;
-                    case R.id.menuChat:
-                        startActivity(new Intent(getApplicationContext(), ChatUS.class));
-                        overridePendingTransition(0,0);
-                        return true;
-                    case R.id.menuHome:
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        overridePendingTransition(0,0);
-                        return true;
-
+                int itemId = item.getItemId();
+                if (itemId == R.id.menuBook) {
+                    startActivity(new Intent(getApplicationContext(), library_my_books.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (itemId == R.id.menuChat) {
+                    startActivity(new Intent(getApplicationContext(), ChatUS.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (itemId == R.id.menuHome) {
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
                 }
-                return  false;
+                return false;
             }
         });
 
@@ -78,6 +77,3 @@ public class Library_main extends AppCompatActivity {
 
     }
 }
-
-
-

@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.instamojo.android.Instamojo;
+//import com.instamojo.android.Instamojo;
 import com.spacECE.spaceceedu.MainActivity;
 import com.spacECE.spaceceedu.R;
 import com.spacECE.spaceceedu.Utils.UsefulFunctions;
@@ -30,7 +30,7 @@ import static com.spacECE.spaceceedu.LearnOnApp.LearnOn_List_RecycleAdapter.orde
 import static java.lang.String.*;
 import static java.lang.String.format;
 
-public class Consultant_GetAppointment extends AppCompatActivity implements Instamojo.InstamojoPaymentCallback {
+public class Consultant_GetAppointment extends AppCompatActivity /*implements Instamojo.InstamojoPaymentCallback*/ {
 
     String name = "No name";
     String consultant_id = "Consultant ID missing";
@@ -135,8 +135,8 @@ public class Consultant_GetAppointment extends AppCompatActivity implements Inst
                 try {
                     if(validTime(timing_from, timing_to, BOOKING_TIME)){
                         tv_confirmation.setText("Appointment booked on " + date + time);
-                        Instamojo.getInstance().initialize(this, Instamojo.Environment.TEST);
-                        Instamojo.getInstance().initiatePayment(this, orderID, this);
+                        //Instamojo.getInstance().initialize(this, Instamojo.Environment.TEST);
+                        //Instamojo.getInstance().initiatePayment(this, orderID, this);
                         //now book appointment in on payment success class
                         BookAppointment();
                     } else {
@@ -300,7 +300,7 @@ public class Consultant_GetAppointment extends AppCompatActivity implements Inst
 
     }
 
-    @Override
+    /*@Override
     public void onInstamojoPaymentComplete(String orderID, String transactionID, String paymentID, String paymentStatus) {
         Log.d("TAG", "Payment complete. Order ID: " + orderID + ", Transaction ID: " + transactionID
                 + ", Payment ID:" + paymentID + ", Status: " + paymentStatus);
@@ -315,5 +315,5 @@ public class Consultant_GetAppointment extends AppCompatActivity implements Inst
     @Override
     public void onInitiatePaymentFailure(String s) {
 
-    }
+    }*/
 }

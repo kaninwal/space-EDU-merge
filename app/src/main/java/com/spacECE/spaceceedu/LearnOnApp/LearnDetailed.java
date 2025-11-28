@@ -11,7 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import com.instamojo.android.Instamojo;
+//import com.instamojo.android.Instamojo;
 import com.spacECE.spaceceedu.R;
 
 import java.text.MessageFormat;
@@ -19,7 +19,7 @@ import java.text.MessageFormat;
 import static com.spacECE.spaceceedu.LearnOnApp.LearnOn_List_RecycleAdapter.orderID;
 
 
-public class LearnDetailed extends AppCompatActivity implements Instamojo.InstamojoPaymentCallback {
+public class LearnDetailed extends AppCompatActivity /*implements Instamojo.InstamojoPaymentCallback*/ {
 
     TextView Id, Title, Description, Duration, Price, Mode_Type;
     Button Buy;
@@ -58,8 +58,8 @@ public class LearnDetailed extends AppCompatActivity implements Instamojo.Instam
         Buy.setOnClickListener(v -> {
             Toast.makeText(LearnDetailed.this, "yeah!", Toast.LENGTH_LONG).show();
 
-            Instamojo.getInstance().initialize(this, Instamojo.Environment.TEST);
-            Instamojo.getInstance().initiatePayment(this, orderID, this);
+//            Instamojo.getInstance().initialize(this, Instamojo.Environment.TEST);
+//            Instamojo.getInstance().initiatePayment(this, orderID, this);
         });
 
     }
@@ -67,19 +67,19 @@ public class LearnDetailed extends AppCompatActivity implements Instamojo.Instam
 
 
 
-    @Override
-    public void onInstamojoPaymentComplete(String orderID, String transactionID, String paymentID, String paymentStatus) {
-        Log.d("TAG", "Payment complete. Order ID: " + orderID + ", Transaction ID: " + transactionID
-                + ", Payment ID:" + paymentID + ", Status: " + paymentStatus);
-    }
-
-    @Override
-    public void onPaymentCancelled() {
-
-    }
-
-    @Override
-    public void onInitiatePaymentFailure(String s) {
-
-    }
+//    @Override
+//    public void onInstamojoPaymentComplete(String orderID, String transactionID, String paymentID, String paymentStatus) {
+//        Log.d("TAG", "Payment complete. Order ID: " + orderID + ", Transaction ID: " + transactionID
+//                + ", Payment ID:" + paymentID + ", Status: " + paymentStatus);
+//    }
+//
+//    @Override
+//    public void onPaymentCancelled() {
+//
+//    }
+//
+//    @Override
+//    public void onInitiatePaymentFailure(String s) {
+//
+//    }
 }

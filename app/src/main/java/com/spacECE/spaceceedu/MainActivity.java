@@ -217,19 +217,19 @@ public class MainActivity extends AppCompatActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     Fragment selectedFragment = null;
 
-                    switch (item.getItemId()) {
-                        case R.id.nav_home:
-                            selectedFragment = new FragmentMain();
-                            break;
-                        case R.id.nav_profile:
-                            selectedFragment = new FragmentProfile();
-                            break;
-                        case R.id.nav_help:
-                            selectedFragment = new FragmentAbout();
-                            break;
+                    int itemId = item.getItemId();
+                    if (itemId == R.id.nav_home) {
+                        selectedFragment = new FragmentMain();
+                    } else if (itemId == R.id.nav_profile) {
+                        selectedFragment = new FragmentProfile();
+                    } else if (itemId == R.id.nav_help) {
+                        selectedFragment = new FragmentAbout();
                     }
-                    getSupportFragmentManager().beginTransaction().replace(R.id.Main_Fragment_layout,
-                            selectedFragment).commit();
+
+                    if (selectedFragment != null) {
+                        getSupportFragmentManager().beginTransaction().replace(R.id.Main_Fragment_layout,
+                                selectedFragment).commit();
+                    }
 
                     return true;
                 }
@@ -250,14 +250,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-
-            case R.id.button_signOut:
-                signOut();
-                return true;
-            case R.id.button_signIn:
-                startActivity(new Intent(getApplicationContext(),LoginActivity.class));
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.button_signOut) {
+            signOut();
+            return true;
+        } else if (itemId == R.id.button_signIn) {
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -296,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //make it 0 if not worked
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 200, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 200, intent, PendingIntent.FLAG_IMMUTABLE);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         long time = System.currentTimeMillis();

@@ -3,6 +3,7 @@ package com.spacECE.spaceceedu.ConsultUS;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -40,19 +41,19 @@ public class Consultant_Main extends AppCompatActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     Fragment selectedFragment = null;
 
-                    switch (item.getItemId()) {
-                        case R.id.consultant_main_navButton_all:
-                            selectedFragment = new Fragment_Consultant_Categories();
-                            break;
-                        case R.id.consultant_main_navButton_my:
-                            selectedFragment = new Fragment_Appointments_For_User();
-                            break;
-                        case R.id.consultant_main_navButton_appointments:
-                            selectedFragment = new Fragment_Appointments_For_Consultants();
+                    int itemId = item.getItemId();
+                    if (itemId == R.id.consultant_main_navButton_all) {
+                        selectedFragment = new Fragment_Consultant_Categories();
+                    } else if (itemId == R.id.consultant_main_navButton_my) {
+                        selectedFragment = new Fragment_Appointments_For_User();
+                    } else if (itemId == R.id.consultant_main_navButton_appointments) {
+                        selectedFragment = new Fragment_Appointments_For_Consultants();
                     }
 
-                    getSupportFragmentManager().beginTransaction().replace(R.id.ConsultantMain_Frame,
-                            selectedFragment).commit();
+                    if (selectedFragment != null) {
+                        getSupportFragmentManager().beginTransaction().replace(R.id.ConsultantMain_Frame,
+                                selectedFragment).commit();
+                    }
 
                     return true;
                 }
@@ -140,8 +141,12 @@ public class Consultant_Main extends AppCompatActivity {
 
 
                                         Intent intent = new Intent(Consultant_Main.this, Notification.class);
+                                        int flags = 0;
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                            flags = PendingIntent.FLAG_IMMUTABLE;
+                                        }
                                         PendingIntent pendingIntent = PendingIntent.getBroadcast(Consultant_Main.this,
-                                                Integer.parseInt(response_element.getString("booking_id")), intent, 0);
+                                                Integer.parseInt(response_element.getString("booking_id")), intent, flags);
                                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                                         Date date = new Date();
                                         Calendar calendar = Calendar.getInstance();
@@ -227,8 +232,12 @@ public class Consultant_Main extends AppCompatActivity {
 
 
                                         Intent intent = new Intent(Consultant_Main.this, Notification.class);
+                                        int flags = 0;
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                            flags = PendingIntent.FLAG_IMMUTABLE;
+                                        }
                                         PendingIntent pendingIntent = PendingIntent.getBroadcast(Consultant_Main.this,
-                                                Integer.parseInt(response_element.getString("booking_id")), intent, 0);
+                                                Integer.parseInt(response_element.getString("booking_id")), intent, flags);
                                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                                         Date date = new Date();
                                         Calendar calendar = Calendar.getInstance();

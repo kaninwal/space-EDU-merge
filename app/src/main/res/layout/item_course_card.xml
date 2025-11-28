@@ -61,12 +61,6 @@
                     android:textStyle="bold"
                     android:textSize="12sp" />
 
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginStart="4dp"
-                    android:src="@drawable/ic_baseline_verified_24"
-                    app:tint="#FFA500" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

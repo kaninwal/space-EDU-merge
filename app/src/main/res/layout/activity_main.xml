@@ -20,7 +20,7 @@
             android:background="@color/white"
             android:theme="?attr/actionBarTheme"
             app:menu="@menu/navigationdrawer_main_activity"
-            app:title="Hi !"
+            app:title="Hi!"
             app:titleTextAppearance="@style/TextAppearance.AppCompat.Display1"
             app:titleTextColor="@color/Spacece_Yellow"/>
 

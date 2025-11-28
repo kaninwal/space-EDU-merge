@@ -3,10 +3,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url "https://s3-ap-southeast-1.amazonaws.com/godel-release/godel/"
-        }
-        jcenter() // Warning: this repository is going to shut down soon
+        maven { url 'https://jitpack.io' }
+        jcenter()
+        maven { url "https://maven.juspay.in/jp-build-packages/release/" }
     }
 }
 rootProject.name = "SpacECEedu"

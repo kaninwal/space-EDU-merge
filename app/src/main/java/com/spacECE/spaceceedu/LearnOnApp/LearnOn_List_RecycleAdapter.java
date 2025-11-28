@@ -10,7 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.instamojo.android.Instamojo;
+//import com.instamojo.android.Instamojo;
 import com.spacECE.spaceceedu.R;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +30,7 @@ public class LearnOn_List_RecycleAdapter extends RecyclerView.Adapter<LearnOn_Li
         this.listener = listener;
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, Instamojo.InstamojoPaymentCallback {
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener /*, Instamojo.InstamojoPaymentCallback*/ {
         private final TextView tv_category;
         private final Button tv_enroll;
 
@@ -41,8 +41,8 @@ public class LearnOn_List_RecycleAdapter extends RecyclerView.Adapter<LearnOn_Li
             tv_enroll = view.findViewById(R.id.Enroll);
             tv_enroll.setOnClickListener(v -> {
 
-                Instamojo.getInstance().initialize(view.getContext(), Instamojo.Environment.TEST);
-                Instamojo.getInstance().initiatePayment((Activity) view.getContext(), orderID, this);
+//                Instamojo.getInstance().initialize(view.getContext(), Instamojo.Environment.TEST);
+//                Instamojo.getInstance().initiatePayment((Activity) view.getContext(), orderID, this);
 
             });
         }
@@ -51,20 +51,20 @@ public class LearnOn_List_RecycleAdapter extends RecyclerView.Adapter<LearnOn_Li
         @Override
         public void onClick(View view) {listener.onClick(view, getAdapterPosition()); }
 
-        @Override
-        public void onInstamojoPaymentComplete(String s, String s1, String s2, String s3) {
-
-        }
-
-        @Override
-        public void onPaymentCancelled() {
-
-        }
-
-        @Override
-        public void onInitiatePaymentFailure(String s) {
-
-        }
+//        @Override
+//        public void onInstamojoPaymentComplete(String s, String s1, String s2, String s3) {
+//
+//        }
+//
+//        @Override
+//        public void onPaymentCancelled() {
+//
+//        }
+//
+//        @Override
+//        public void onInitiatePaymentFailure(String s) {
+//
+//        }
     }
 
 
