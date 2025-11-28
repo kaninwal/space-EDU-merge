@@ -4,6 +4,8 @@ plugins {
 }
 
 android {
+    namespace "com.spacECE.spaceceedu"
+
     compileSdk 30
 
     defaultConfig {
@@ -52,19 +54,23 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5'
+
+    // Reverted to original JCenter artifact, ensuring JCenter is available in settings.gradle
     implementation 'com.synnapps:carouselview:0.1.5'
+    
     implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
 
     //
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
-    //mojo
-    implementation 'com.instamojo:android-sdk:3.5.0'
+    // Mojo - Trying 3.6.6 with original group ID, which might be on JCenter/MavenCentral
+    implementation 'com.instamojo:android-sdk:3.6.6'
 
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
 
-    implementation 'io.agora.rtc:full-sdk:3.2.1'
+    // Agora
+    implementation 'io.agora.rtc:full-sdk:3.5.0'
+    implementation "com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0"
 
 }
