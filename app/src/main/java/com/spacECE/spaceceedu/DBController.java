@@ -97,6 +97,9 @@ public class DBController  extends SQLiteOpenHelper {
 
     public ActivityData getLastActivity(){
         List<ActivityData> activityDataList = getAll();
+        if (activityDataList.isEmpty()) {
+            return null;
+        }
         ActivityData lastActivity = activityDataList.get(activityDataList.size()-1);
         return lastActivity;
     }

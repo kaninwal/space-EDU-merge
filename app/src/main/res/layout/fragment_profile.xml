@@ -350,6 +350,7 @@
                     android:id="@+id/CantactUs"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
                     android:text="Contact us"
                     android:textSize="16sp" />
 
@@ -357,7 +358,7 @@
                     android:id="@+id/ArrowDown"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:layout_marginStart="190dp"
+                    android:layout_marginStart="150dp"
                     android:background="@android:color/transparent"
                     android:scaleType="fitCenter"
                     android:src="@drawable/arrowdown"

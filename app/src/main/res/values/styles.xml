@@ -124,4 +124,9 @@
         <item name="android:textColor">#333333</item>
     </style>
 
+    <style name="ShapeAppearance.SpaceECE.Box" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
 </resources>
