@@ -23,68 +23,65 @@ public class ReminderBroadCastReciever extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        //int dayNo = intent.getExtras().getInt("EXTRA_DAY_NO");
-        //Log.d(TAG, "onReceive: Extra "+dayNo);
         DBController dbController = new DBController(context);
         ActivityData lastActivity = dbController.getLastActivity();
+
+        // If there's no last activity, do nothing and return.
+        if (lastActivity == null) {
+            Log.d(TAG, "onReceive: No activities in the database, skipping notification.");
+            return;
+        }
+
         int dayNo = dbController.isNewUser();
         dayNo++;
 
-        Log.d(TAG, "onReceive: day"+dayNo);
+        Log.d(TAG, "onReceive: day" + dayNo);
         GetRecentActivity getRecentActivity = new GetRecentActivity(dayNo);
         getRecentActivity.execute();
 
         String activityNo = lastActivity.getData().get(0).getActivityNo();
         String activityName = lastActivity.getData().get(0).getActivityName();
 
-        Intent repeatingIntent = new Intent(context,ActivityDetailsActivity.class);
-        repeatingIntent.putExtra("EXTRA_ACTIVITY",lastActivity);
+        Intent repeatingIntent = new Intent(context, ActivityDetailsActivity.class);
+        repeatingIntent.putExtra("EXTRA_ACTIVITY", lastActivity);
         repeatingIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(context,200,repeatingIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 200, repeatingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notify")
                 .setSmallIcon(R.drawable.logo)
                 .setContentIntent(pendingIntent)
-                .setContentTitle("SpaceActive - Activity "+activityNo)
+                .setContentTitle("SpaceActive - Activity " + activityNo)
                 .setContentText(activityName)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
-            notificationManagerCompat.notify(200, builder.build());
-            Log.d(TAG, "onReceive:notification sent ");
-
-
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+        notificationManagerCompat.notify(200, builder.build());
+        Log.d(TAG, "onReceive:notification sent ");
     }
 
-
-    class GetRecentActivity extends AsyncTask<String,Void, JSONObject> {
+    class GetRecentActivity extends AsyncTask<String, Void, JSONObject> {
 
         final private JSONObject[] apiCall = {null};
         int dayNo;
 
-
-        GetRecentActivity(int dayNo){
+        GetRecentActivity(int dayNo) {
             this.dayNo = dayNo;
         }
 
         @Override
         protected JSONObject doInBackground(String... strings) {
-
             try {
-
-                apiCall[0] = UsefulFunctions.UsingGetAPI("http://educationfoundation.space/spacece/api/spaceactive_activities.php?ano="+dayNo);
-                Log.d(TAG, "Object Obtained "+apiCall[0].toString());
+                apiCall[0] = UsefulFunctions.UsingGetAPI("http://educationfoundation.space/spacece/api/spaceactive_activities.php?ano=" + dayNo);
+                Log.d(TAG, "Object Obtained " + apiCall[0].toString());
 
                 GsonBuilder gsonBuilder = new GsonBuilder();
                 Gson gson = gsonBuilder.create();
-                ActivityData activityData = gson.fromJson(apiCall[0].toString(),ActivityData.class);
+                ActivityData activityData = gson.fromJson(apiCall[0].toString(), ActivityData.class);
                 ActivitiesListActivity.InsertDataIntoSqlite(activityData);
-
-            }catch (RuntimeException runtimeException){
-                Log.d(TAG, "RUNTIME EXCEPTION:::, Server did not respons");
+            } catch (RuntimeException runtimeException) {
+                Log.d(TAG, "RUNTIME EXCEPTION:::, Server did not respond");
             }
-
             return null;
         }
     }
