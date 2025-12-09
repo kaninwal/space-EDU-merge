@@ -37,7 +37,7 @@ public class ReminderBroadCastReciever extends BroadcastReceiver {
         dayNo++;
 
         Log.d(TAG, "onReceive: day" + dayNo);
-        GetRecentActivity getRecentActivity = new GetRecentActivity(dayNo);
+        GetRecentActivity getRecentActivity = new GetRecentActivity(context, dayNo);
         getRecentActivity.execute();
 
         String activityNo = lastActivity.getData().get(0).getActivityNo();
@@ -68,9 +68,11 @@ public class ReminderBroadCastReciever extends BroadcastReceiver {
     class GetRecentActivity extends AsyncTask<String, Void, JSONObject> {
 
         final private JSONObject[] apiCall = {null};
+        private Context context;
         int dayNo;
 
-        GetRecentActivity(int dayNo) {
+        GetRecentActivity(Context context, int dayNo) {
+            this.context = context;
             this.dayNo = dayNo;
         }
 
@@ -85,7 +87,7 @@ public class ReminderBroadCastReciever extends BroadcastReceiver {
                     Gson gson = gsonBuilder.create();
                     ActivityData activityData = gson.fromJson(apiCall[0].toString(), ActivityData.class);
                     if (activityData != null && activityData.getData() != null && !activityData.getData().isEmpty()) {
-                        ActivitiesListActivity.InsertDataIntoSqlite(activityData);
+                        ActivitiesListActivity.InsertDataIntoSqlite(context, activityData);
                     }
                 }
             } catch (RuntimeException runtimeException) {

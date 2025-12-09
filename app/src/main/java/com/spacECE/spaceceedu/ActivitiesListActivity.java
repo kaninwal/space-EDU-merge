@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -223,13 +224,23 @@ public class ActivitiesListActivity extends AppCompatActivity implements Adapter
     }
 
 
-    public static void InsertDataIntoSqlite(ActivityData activityData){
-        List<ActivityData> activityDataList = dbController.getAll();
+    public static void InsertDataIntoSqlite(Context context, ActivityData activityData){
+        DBController localDbController = new DBController(context);
+        List<ActivityData> activityDataList = localDbController.getAll();
+        
+        if (activityDataList.isEmpty()) {
+            int status = localDbController.insertRecord(activityData);
+            if(status >0){
+                Log.d(TAG, "setDummyData: Data Inserted"+status);
+            }
+            return;
+        }
+        
         ActivityData lastActivity = activityDataList.get(activityDataList.size()-1);
 
-        if(!(activityData.getData().get(0).getActivityNo() == lastActivity.getData().get(0).getActivityNo())){
+        if(!(activityData.getData().get(0).getActivityNo().equals(lastActivity.getData().get(0).getActivityNo()))){
 
-        int status = dbController.insertRecord(activityData);
+        int status = localDbController.insertRecord(activityData);
             if(status >0){
                 Log.d(TAG, "setDummyData: Data Inserted"+status);
             }
