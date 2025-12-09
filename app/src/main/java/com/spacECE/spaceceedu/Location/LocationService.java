@@ -16,15 +16,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class LocationService extends Activity {
+import static android.content.Context.LOCATION_SERVICE;
+
+public class LocationService {
     
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private Context context;
 
     private String url = "http://spacefoundation.in/test/SpacECE-PHP/api/add_tracking_api.php";
 
     public void Start(Context context, Activity activity) {
-
+        this.context = context;
         locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
 
@@ -44,23 +47,30 @@ public class LocationService extends Activity {
             ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION}, 2);
         } else {
-            locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER,
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                     1000, 10, locationListener);
         }
 
     }
 
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
-                locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER,
-                        1000, 10, locationListener);
+                if (locationManager != null && locationListener != null) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                            1000, 10, locationListener);
+                }
             }
+        }
+    }
+
+    public void Stop() {
+        if (locationManager != null && locationListener != null) {
+            locationManager.removeUpdates(locationListener);
+            Log.d("LocationService", "Location updates stopped");
         }
     }
 
@@ -101,4 +111,3 @@ public class LocationService extends Activity {
    
     
 }
-

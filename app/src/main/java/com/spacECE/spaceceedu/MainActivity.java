@@ -1,8 +1,10 @@
 package com.spacECE.spaceceedu;
 
+import android.Manifest;
 import android.app.*;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     DBController dbController;
     int dayNo;
     public final String TAG = "MainActivity";
+    private LocationService locationService;
 
     @Override
     protected void onPostResume() {
@@ -175,10 +178,18 @@ public class MainActivity extends AppCompatActivity {
 
         //Starting Location Service
         //more info in the respective class
-        LocationService locationService = new LocationService();
+        locationService = new LocationService();
         locationService.Start(this, this);
 
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(locationService != null) {
+            locationService.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
 
