@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.spacECE.spaceceedu">
 
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -91,12 +98,7 @@
         <activity
             android:name=".Authentication.LoginActivity"
             android:exported="true" />
-        <activity
-            android:name=".Authentication.ForgotPasswordActivity"
-            android:exported="true" />
-        <activity
-            android:name=".Authentication.ResetPasswordActivity"
-            android:exported="true" />
+
         <activity
             android:name=".LibForSmall.Library_main"
             android:exported="true" />

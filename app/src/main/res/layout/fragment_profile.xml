@@ -18,7 +18,8 @@
             android:background="@color/white"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="16dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
             <ImageView
                 android:layout_width="32dp"
@@ -60,7 +61,8 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/bg_tab_unselected"
-                android:paddingHorizontal="24dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
                 android:paddingVertical="8dp"
                 android:text="Child Profile"
                 android:textColor="#FFA500"
@@ -116,7 +118,6 @@
 
                 <EditText
                     style="@style/ProfileInput"
-
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:hint="Filed Entry" />
