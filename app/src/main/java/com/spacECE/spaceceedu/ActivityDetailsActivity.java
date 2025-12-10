@@ -23,9 +23,9 @@ public class ActivityDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_details);
 
 
-        textViewTitle = findViewById(R.id.textView_activity_title);
-        textViewDesc = findViewById(R.id.textView_activity_desc);
-        textViewDay = findViewById(R.id.textView_activity_day);
+        textViewTitle = findViewById(R.id.act_details_title);
+        textViewDesc = findViewById(R.id.act_details_objective);
+        textViewDay = findViewById(R.id.act_details_no);
 
         ActivityData activityData;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

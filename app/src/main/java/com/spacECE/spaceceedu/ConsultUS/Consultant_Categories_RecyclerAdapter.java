@@ -38,7 +38,7 @@ public class Consultant_Categories_RecyclerAdapter extends RecyclerView.Adapter<
         }
 
         @Override
-        public void onClick(View view) {listener.onClick(view, getAdapterPosition()); }
+        public void onClick(View view) {listener.onClick(view, getBindingAdapterPosition()); }
     }
 
     @NonNull

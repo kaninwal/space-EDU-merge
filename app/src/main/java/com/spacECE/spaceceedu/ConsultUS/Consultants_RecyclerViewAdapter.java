@@ -39,7 +39,7 @@ public class Consultants_RecyclerViewAdapter extends RecyclerView.Adapter<Consul
         }
 
         @Override
-        public void onClick(View view) {listener.onClick(view, getAdapterPosition()); }
+        public void onClick(View view) {listener.onClick(view, getBindingAdapterPosition()); }
     }
 
     @NonNull

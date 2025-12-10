@@ -8,7 +8,11 @@ import android.os.Bundle;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.spacECE.spaceceedu.R;
 
+import java.util.ArrayList;
+
 public class Library_main extends AppCompatActivity {
+
+    public static ArrayList<books> list = new ArrayList<>();
 
     BottomNavigationView bottomNavigationView;
 
