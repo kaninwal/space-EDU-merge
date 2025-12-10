@@ -46,7 +46,7 @@ public class Appointments_For_User_RecyclerViewAdapter extends RecyclerView.Adap
         }
 
         @Override
-        public void onClick(View view) {listener.onClick(view, getAdapterPosition()); }
+        public void onClick(View view) {listener.onClick(view, getBindingAdapterPosition()); }
     }
 
     @NonNull
@@ -67,9 +67,9 @@ public class Appointments_For_User_RecyclerViewAdapter extends RecyclerView.Adap
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), Agoraa.class);
-                intent.putExtra("c_id", myConsultants.get(holder.getAdapterPosition()).getConsult_id());
-                intent.putExtra("c_name", myConsultants.get(holder.getAdapterPosition()).getC_name());
-                intent.putExtra("c_pic", myConsultants.get(holder.getAdapterPosition()).getC_pic());
+                intent.putExtra("c_id", myConsultants.get(holder.getBindingAdapterPosition()).getConsult_id());
+                intent.putExtra("c_name", myConsultants.get(holder.getBindingAdapterPosition()).getC_name());
+                intent.putExtra("c_pic", myConsultants.get(holder.getBindingAdapterPosition()).getC_pic());
                 v.getContext().startActivity(intent);
             }
         });

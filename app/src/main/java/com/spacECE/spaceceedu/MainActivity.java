@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,6 +54,8 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -104,8 +108,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        FirebaseApp.initializeApp(this);
 
         //disabled night mode
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -176,8 +178,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "onCreate: "+"new User");
             createNotificationChannel();
             sendNotification();
-            GetFirstActivity getActivities = new GetFirstActivity();
-            getActivities.execute();
+            runGetFirstActivityTask();
         }
 
         //Starting Location Service
@@ -186,6 +187,37 @@ public class MainActivity extends AppCompatActivity {
         locationService.Start(this, this);
 
 
+    }
+
+    private void runGetFirstActivityTask() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            //Background work here
+            try {
+                JSONObject apiCall = UsefulFunctions.UsingGetAPI("http://educationfoundation.space/spacece/api/spaceactive_activities.php?ano=1");
+                Log.d(TAG, "Object Obtained " + (apiCall != null ? apiCall.toString() : "null"));
+
+                if (apiCall != null) {
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    Gson gson = gsonBuilder.create();
+                    ActivityData activityData = gson.fromJson(apiCall.toString(), ActivityData.class);
+                    Log.d(TAG, "doInBackground: activity_dev_domain " + activityData.getData().get(0).getActivityDevDomain());
+
+                    DBController dbController = new DBController(MainActivity.this);
+                    dbController.insertRecord(activityData);
+                    Log.d(TAG, "doInBackground: " + dbController.isNewUser());
+                }
+
+            } catch (RuntimeException runtimeException) {
+                Log.d(TAG, "RUNTIME EXCEPTION:::, Server did not respond");
+            }
+
+            handler.post(() -> {
+                //UI Thread work here
+            });
+        });
     }
 
     @Override
@@ -343,34 +375,5 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    class GetFirstActivity extends AsyncTask<String,Void,JSONObject>{
-
-        final private JSONObject[] apiCall = {null};
-
-        @Override
-        protected JSONObject doInBackground(String... strings) {
-
-            try {
-
-                apiCall[0] = UsefulFunctions.UsingGetAPI("http://educationfoundation.space/spacece/api/spaceactive_activities.php?ano=1");
-                Log.d(TAG, "Object Obtained "+apiCall[0].toString());
-
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                Gson gson = gsonBuilder.create();
-                ActivityData activityData = gson.fromJson(apiCall[0].toString(),ActivityData.class);
-                Log.d(TAG, "doInBackground: activity_dev_domain "+activityData.getData().get(0).getActivityDevDomain());
-                //List<Data> list = activityData.getData();
-
-                DBController dbController = new DBController(MainActivity.this);
-                dbController.insertRecord(activityData);
-                Log.d(TAG, "doInBackground: "+dbController.isNewUser());
-
-            }catch (RuntimeException runtimeException){
-                Log.d(TAG, "RUNTIME EXCEPTION:::, Server did not respons");
-            }
-
-            return null;
-        }
-    }
-
+    // Removed the deprecated AsyncTask class GetFirstActivity
 }

@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -16,6 +18,9 @@ import com.google.gson.GsonBuilder;
 
 import com.spacECE.spaceceedu.Utils.UsefulFunctions;
 import org.json.JSONObject;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ReminderBroadCastReciever extends BroadcastReceiver {
 
@@ -37,10 +42,8 @@ public class ReminderBroadCastReciever extends BroadcastReceiver {
         dayNo++;
 
         Log.d(TAG, "onReceive: day" + dayNo);
-        GetRecentActivity getRecentActivity = new GetRecentActivity(context, dayNo);
-        getRecentActivity.execute();
+        runGetRecentActivityTask(context, dayNo);
 
-        // Since we checked for lastActivity and its data above, this is now safe
         String activityNo = lastActivity.getData().get(0).getActivityNo();
         String activityName = lastActivity.getData().get(0).getActivityName();
 
@@ -66,27 +69,20 @@ public class ReminderBroadCastReciever extends BroadcastReceiver {
         Log.d(TAG, "onReceive:notification sent ");
     }
 
-    class GetRecentActivity extends AsyncTask<String, Void, JSONObject> {
+    private void runGetRecentActivityTask(Context context, int dayNo) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
 
-        final private JSONObject[] apiCall = {null};
-        private Context context;
-        int dayNo;
-
-        GetRecentActivity(Context context, int dayNo) {
-            this.context = context;
-            this.dayNo = dayNo;
-        }
-
-        @Override
-        protected JSONObject doInBackground(String... strings) {
+        executor.execute(() -> {
+            //Background work here
             try {
-                apiCall[0] = UsefulFunctions.UsingGetAPI("http://educationfoundation.space/spacece/api/spaceactive_activities.php?ano=" + dayNo);
-                Log.d(TAG, "Object Obtained " + (apiCall[0] != null ? apiCall[0].toString() : "null"));
+                JSONObject apiCall = UsefulFunctions.UsingGetAPI("http://educationfoundation.space/spacece/api/spaceactive_activities.php?ano=" + dayNo);
+                Log.d(TAG, "Object Obtained " + (apiCall != null ? apiCall.toString() : "null"));
 
-                if (apiCall[0] != null) {
+                if (apiCall != null) {
                     GsonBuilder gsonBuilder = new GsonBuilder();
                     Gson gson = gsonBuilder.create();
-                    ActivityData activityData = gson.fromJson(apiCall[0].toString(), ActivityData.class);
+                    ActivityData activityData = gson.fromJson(apiCall.toString(), ActivityData.class);
                     if (activityData != null && activityData.getData() != null && !activityData.getData().isEmpty()) {
                         ActivitiesListActivity.InsertDataIntoSqlite(context, activityData);
                     }
@@ -94,7 +90,10 @@ public class ReminderBroadCastReciever extends BroadcastReceiver {
             } catch (RuntimeException runtimeException) {
                 Log.d(TAG, "RUNTIME EXCEPTION:::, Server did not respond");
             }
-            return null;
-        }
+
+            handler.post(() -> {
+                //UI Thread work here
+            });
+        });
     }
 }
