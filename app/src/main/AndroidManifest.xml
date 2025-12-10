@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.spacECE.spaceceedu">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <uses-feature
         android:name="android.hardware.telephony"
@@ -55,6 +61,7 @@
         <activity android:name=".LearnOnApp.LearnOn_Main" />
         <activity android:name=".LearnOnApp.LearnOn_List_SplashScreen" />
         <activity android:name=".LibForSmall.library_my_books"/>
+        <activity android:name=".LibForSmall.library_splash_screen"/>
 
         <activity
             android:name=".Authentication.ConsultantRegistrationInit"

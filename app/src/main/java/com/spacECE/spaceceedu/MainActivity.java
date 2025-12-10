@@ -26,9 +26,12 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -102,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FirebaseApp.initializeApp(this);
+
         //disabled night mode
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
@@ -119,18 +124,17 @@ public class MainActivity extends AppCompatActivity {
 
         if (firstStart) {
             //causing crash on first boot TODO
-//            FirebaseMessaging.getInstance().getToken()
-//                    .addOnCompleteListener(new OnCompleteListener<String>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<String> task) {
-//                            if (!task.isSuccessful()) {
-//                                Log.w("FCM TOKEN : ", "Fetching FCM registration token failed", task.getException());
-//                                return;
-//                            }
-//                            Log.d("FCM TOKEN : ", task.getResult());
-//                            sendTokenToServer(task.getResult());
-//                        }
-//                    });
+            FirebaseMessaging.getInstance().getToken()
+                    .addOnCompleteListener(new OnCompleteListener<String>() {
+                        @Override
+                        public void onComplete(@NonNull Task<String> task) {
+                           if (!task.isSuccessful()) {
+                               Log.w("FCM TOKEN : ", "Fetching FCM registration token failed", task.getException());
+                               return;
+                            }             Log.d("FCM TOKEN : ", task.getResult());
+                           sendTokenToServer(task.getResult());
+                      }
+                   });
 
             prefs = getSharedPreferences("prefs", MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();

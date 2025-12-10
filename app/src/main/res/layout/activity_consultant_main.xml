@@ -1,32 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ConsultUS.Consultant_Main"
-    android:background="@color/Spacece_Yelloww">
-
-
-<Toolbar
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:titleTextColor="@color/white"
-    android:title="Consultants"/>
+    tools:context=".ConsultUS.Consultant_Main">
 
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/ConsultantMain_Frame"
-        android:layout_weight="1">
-
-    </FrameLayout>
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#f5f5f5" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/Consultant_Main_BottomNav"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:itemIconTint="@color/Spacece_Yellow"
+        app:itemTextColor="@color/Spacece_Yellow"
+        app:menu="@menu/consultant_main_user_bottomnav" />
 
 </LinearLayout>

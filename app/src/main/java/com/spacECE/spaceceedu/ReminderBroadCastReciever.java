@@ -40,6 +40,7 @@ public class ReminderBroadCastReciever extends BroadcastReceiver {
         GetRecentActivity getRecentActivity = new GetRecentActivity(context, dayNo);
         getRecentActivity.execute();
 
+        // Since we checked for lastActivity and its data above, this is now safe
         String activityNo = lastActivity.getData().get(0).getActivityNo();
         String activityName = lastActivity.getData().get(0).getActivityName();
 

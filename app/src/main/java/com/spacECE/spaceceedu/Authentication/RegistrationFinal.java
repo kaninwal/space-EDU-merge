@@ -8,6 +8,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.*;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -38,7 +42,6 @@ public class RegistrationFinal extends AppCompatActivity {
     private ImageView iv_profile_pic;
     private EditText ev_email,ev_phoneNo,ev_password, ev_re_password,ev_name;
     private boolean imageUpload=false;
-    private static final int IMAGE_PICK_CODE = 1000;
     private static final int PERMISSION_CODE = 1001;
     private Uri picData= Uri.parse(String.valueOf(R.drawable.default_profilepic));
     Toolbar toolbar;
@@ -46,6 +49,10 @@ public class RegistrationFinal extends AppCompatActivity {
 
     String TYPE = "customer", LANGUAGE, ADDRESS, FEE,
             QUALIFICATION, START_TIME, END_TIME;
+
+    // Use ActivityResultLauncher instead of startActivityForResult (Deprecated)
+    ActivityResultLauncher<Intent> imagePickLauncher;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +69,23 @@ public class RegistrationFinal extends AppCompatActivity {
         ev_re_password =findViewById(R.id.UserRegistration_editTextText_Re_Password);
         ev_name=findViewById(R.id.UserRegistration_editTextText_Name);
         ev_phoneNo=findViewById(R.id.UserRegistration_editTextText_PhoneNumber);
+
+        //Initialize the launcher
+        imagePickLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            Intent data = result.getData();
+                            b_register.setText("Register");
+                            picData = data.getData();
+                            iv_profile_pic.setImageURI(picData);
+                        }
+                    }
+                }
+        );
+
 
         //Intent and shit
 
@@ -137,7 +161,7 @@ public class RegistrationFinal extends AppCompatActivity {
         //intent to pick image
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
-        startActivityForResult(intent, IMAGE_PICK_CODE);
+        imagePickLauncher.launch(intent);
     }
 
     @Override
@@ -157,16 +181,7 @@ public class RegistrationFinal extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == IMAGE_PICK_CODE) {
-            //set image to image view
-            b_register.setText("Register");
-            picData= data.getData();
-            iv_profile_pic.setImageURI(data.getData());
-        }
-    }
+    // onActivityResult is removed as we use ActivityResultLauncher now.
 
     private boolean validTime(String fromTime, String endTime) throws ParseException {
         if(fromTime == null & endTime == null) {
@@ -235,6 +250,20 @@ public class RegistrationFinal extends AppCompatActivity {
                 OkHttpClient client = new OkHttpClient();
                 RequestBody fromBody;
 
+                // Use RequestBody.create with byte[] directly, avoiding deprecated create(MediaType, byte[]) if possible
+                // However, OkHttp 3.x vs 4.x changes this. In 4.x it is create(byte[], MediaType).
+                // To be safe with deprecation warnings and cross-version compatibility:
+                // We use RequestBody.create(MediaType, byte[]) which is standard in OkHttp 3.
+                // If using OkHttp 4.x, the order is swapped or it's an extension function in Kotlin.
+                // Since this is Java and likely OkHttp 4 (based on build.gradle), the deprecated warning exists.
+                // The correct replacement for Java in OkHttp 4.x is RequestBody.create(bytes, MediaType)
+                // BUT the library signature might confuse the compiler or previous versions.
+                // Let's try the modern order: create(byte[], MediaType) if valid, or just suppress/ignore if it's just a warning.
+                // Given the warning log: "create(MediaType,byte[]) ... has been deprecated",
+                // The new signature is create(byte[], MediaType).
+                
+                MediaType mediaType = MediaType.parse("image/*jpg");
+
                 if(TYPE != null & LANGUAGE != null & ADDRESS != null & FEE != null
                         & QUALIFICATION != null & START_TIME != null & END_TIME != null) {
                     fromBody = new MultipartBody.Builder()
@@ -244,7 +273,7 @@ public class RegistrationFinal extends AppCompatActivity {
                             .addFormDataPart("password", password)
                             .addFormDataPart("phone", phone)
                             .addFormDataPart("image", name+".jpg",
-                                    RequestBody.create(MediaType.parse("image/*jpg"), encodedImage))
+                                    RequestBody.create(encodedImage, mediaType)) // Swapped for OkHttp 4.x
                             .addFormDataPart("type", "consultant")
                             .addFormDataPart("c_categories", TYPE)
                             .addFormDataPart("c_office", ADDRESS)
@@ -264,7 +293,7 @@ public class RegistrationFinal extends AppCompatActivity {
                             .addFormDataPart("password", password)
                             .addFormDataPart("phone", phone)
                             .addFormDataPart("image", name+".jpg",
-                                    RequestBody.create(MediaType.parse("image/*jpg"), encodedImage))
+                                    RequestBody.create(encodedImage, mediaType)) // Swapped for OkHttp 4.x
                             .addFormDataPart("type", "customer")
                             .build();
                 }

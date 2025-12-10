@@ -13,3 +13,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Ignore APKs
+*.apk
+
+# Ignore debug folder
+/app/build/
+/app/debug/
+/app/release/

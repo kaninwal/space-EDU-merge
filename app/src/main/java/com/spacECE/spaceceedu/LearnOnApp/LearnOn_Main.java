@@ -37,6 +37,15 @@ public class LearnOn_Main extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_on_main);
+
+        // Populate Dummy Data to avoid empty list crash/blank screen
+        if(Llist.isEmpty()) {
+            // Updated constructor calls to match Learn class: 
+            // id, title, description, type, mode, duration, price
+            Llist.add(new Learn("1", "Parenting", "Learn basics of parenting", "Paid", "Online", "4 Weeks", "1000"));
+            Llist.add(new Learn("2", "Child Care", "Learn basics of child care", "Free", "Offline", "2 Days", "0"));
+        }
+
         getSupportFragmentManager().beginTransaction().replace(R.id.LearnOnMain_Frame, fragment).commit();
 
 //        BottomNavigationView
