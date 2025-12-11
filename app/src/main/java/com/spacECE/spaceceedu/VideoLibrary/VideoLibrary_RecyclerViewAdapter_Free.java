@@ -37,7 +37,7 @@ public class VideoLibrary_RecyclerViewAdapter_Free extends RecyclerView.Adapter<
 
         @Override
         public void onClick(View view) {
-            listener.onClick(view, getAdapterPosition());
+            listener.onClick(view, getBindingAdapterPosition());
         }
     }
 

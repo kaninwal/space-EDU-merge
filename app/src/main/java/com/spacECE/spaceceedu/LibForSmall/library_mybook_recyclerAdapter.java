@@ -54,7 +54,7 @@ public class library_mybook_recyclerAdapter extends RecyclerView.Adapter<library
 
         @Override
         public void onClick(View view) {
-            listener.onClick(view, getAdapterPosition());
+            listener.onClick(view, getBindingAdapterPosition());
         }
     }
 
