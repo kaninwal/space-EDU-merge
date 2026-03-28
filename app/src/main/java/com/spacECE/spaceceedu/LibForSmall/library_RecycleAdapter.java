@@ -3,6 +3,7 @@ package com.spacECE.spaceceedu.LibForSmall;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.spacECE.spaceceedu.LibForSmall.books;
 import com.spacECE.spaceceedu.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -32,9 +34,24 @@ public class library_RecycleAdapter extends RecyclerView.Adapter<library_Recycle
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.book_name.setText(list.get(position).getProduct_title());
-        holder.book_category.setText(list.get(position).getProduct_desc());
-        holder.book_price.setText(list.get(position).getExchange_price());
+        books currentBook = list.get(position);
+        holder.book_name.setText(currentBook.getProduct_title());
+        holder.book_category.setText(currentBook.getProduct_desc());
+        holder.book_price.setText(currentBook.getExchange_price());
+
+        String imageUrl = currentBook.getProduct_image();
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            if (!imageUrl.startsWith("http")) {
+                imageUrl = "https://hustle-7c68d043.mileswebhosting.com/spacece/libforsmall/product_images/" + imageUrl;
+            }
+            Picasso.get()
+                    .load(imageUrl)
+                    .placeholder(R.drawable.logo)
+                    .error(R.drawable.logo)
+                    .into(holder.book_image);
+        } else {
+            holder.book_image.setImageResource(R.drawable.logo);
+        }
     }
 
     @Override
@@ -46,13 +63,14 @@ public class library_RecycleAdapter extends RecyclerView.Adapter<library_Recycle
         private final TextView book_name;
         private final TextView book_category ;
         private final TextView book_price;
+        private final ImageView book_image;
+
         public MyViewHolder(@NonNull View view) {
             super(view);
             book_name=view.findViewById(R.id.cardview_bookname);
-            view.setOnClickListener(this);
             book_price=view.findViewById(R.id.cardview_price);
-            view.setOnClickListener(this);
             book_category=view.findViewById(R.id.cardview_category);
+            book_image = view.findViewById(R.id.cardview_bookimage);
             view.setOnClickListener(this);
         }
 

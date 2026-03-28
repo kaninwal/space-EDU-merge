@@ -5,7 +5,7 @@ import android.app.*;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,23 +17,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.WindowCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -41,255 +37,307 @@ import com.spacECE.spaceceedu.Authentication.Account;
 import com.spacECE.spaceceedu.Authentication.LoginActivity;
 import com.spacECE.spaceceedu.Authentication.UserLocalStore;
 import com.spacECE.spaceceedu.Location.LocationService;
-import com.spacECE.spaceceedu.Utils.Notification;
 import com.spacECE.spaceceedu.Utils.UsefulFunctions;
-import com.spacECE.spaceceedu.VideoLibrary.Topic;
-import com.spacECE.spaceceedu.VideoLibrary.VideoLibrary_Activity;
 
 import com.squareup.picasso.Picasso;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawer;
     private Toolbar toolbar;
-    public static Account ACCOUNT=null;
+    public static Account ACCOUNT = null;
     UserLocalStore userLocalStore;
     DBController dbController;
-    int dayNo;
     public final String TAG = "MainActivity";
     private LocationService locationService;
+
+    private static final String INSTAGRAM_URL = "https://www.instagram.com/spac.ece/";
+    private static final String YOUTUBE_URL = "https://www.youtube.com/@SpacECE";
+    private static final String FACEBOOK_URL = "https://www.facebook.com/SpacECE/";
+    private static final String LINKEDIN_URL = "https://www.linkedin.com/company/spacecein/";
+    private static final String TWITTER_URL = "https://x.com/ece_spac";
+    private static final String ABOUT_US_URL = "https://www.spacece.in/about-us";
+    private static final String TERMS_AND_CONDITIONS_URL = "https://www.spacece.co/terms-and-conditions";
+    private static final String PRIVACY_POLICY_URL = "https://www.spacece.co/privacy-policy";
+    private static final String PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.spacece.milestonetracker";
+    private static final String MAP_LOCATION = "geo:0,0?q=SpacECE INDIA FOUNDATION, CHANDRALOK NAGARI, C602, opp. Muktai Garden, Ganesh Nagar, Dhayari, Pune, Maharashtra 411041";
+    private static final String CONTACT_US_EMAIL = "contact@spacece.in";
+
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
         SetAccountDetails();
-
-
     }
 
     private void SetAccountDetails() {
-        if(ACCOUNT!=null) {
-            toolbar.setTitle("Hello "+ACCOUNT.getUsername()+" !");
-            NavigationView navigationView = (NavigationView) findViewById(R.id.Main_navView_drawer);
-
-            // get menu from navigationView
-            View navHead = navigationView.getHeaderView(0);
-
-            // find MenuItem you want to change
-            ImageView nav_camara = navHead.findViewById(R.id.Main_nav_drawer_profile_pic);
-
-            //https connection doesn't work as of now use http
-
-            try {
-                Picasso.get().load(ACCOUNT.getProfile_pic().replace("https://","http://")).into(nav_camara);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (toolbar != null) {
+            if (ACCOUNT != null && ACCOUNT.getUsername() != null && !ACCOUNT.getUsername().isEmpty() && !ACCOUNT.getUsername().equalsIgnoreCase("null")) {
+                toolbar.setTitle("Hi " + ACCOUNT.getUsername() + " !");
+            } else {
+                toolbar.setTitle("Hi!");
             }
+        }
 
+        if (ACCOUNT != null) {
+            NavigationView navigationView = findViewById(R.id.Main_navView_drawer);
 
+            if (navigationView != null) {
+                View navHead = navigationView.getHeaderView(0);
+                ImageView nav_camara = navHead.findViewById(R.id.Main_nav_drawer_profile_pic);
+
+                if (nav_camara != null && ACCOUNT.getProfile_pic() != null && !ACCOUNT.getProfile_pic().isEmpty()) {
+                    try {
+                        Picasso.get().load(ACCOUNT.getProfile_pic().replace("https://", "http://")).into(nav_camara);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             invalidateOptionsMenu();
-
-
-
-
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+
         setContentView(R.layout.activity_main);
 
-        //disabled night mode
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         userLocalStore = new UserLocalStore(getApplicationContext());
+        dbController = DBController.getInstance(this);
 
-        Log.i("DEVICE TOKEN","In next line");
-        //Android ID:
-        //Log.i("DEVICE TOKEN : ",Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
         SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         boolean firstStart = prefs.getBoolean("firstStart", true);
 
-        if(authenticate()){
+        if (authenticate()) {
             getDetails();
         }
 
         if (firstStart) {
-            //causing crash on first boot TODO
             FirebaseMessaging.getInstance().getToken()
-                    .addOnCompleteListener(new OnCompleteListener<String>() {
-                        @Override
-                        public void onComplete(@NonNull Task<String> task) {
-                           if (!task.isSuccessful()) {
-                               Log.w("FCM TOKEN : ", "Fetching FCM registration token failed", task.getException());
-                               return;
-                            }             Log.d("FCM TOKEN : ", task.getResult());
-                           sendTokenToServer(task.getResult());
-                      }
-                   });
+                    .addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Log.w("FCM TOKEN : ", "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+                        Log.d("FCM TOKEN : ", task.getResult());
+                        sendTokenToServer(task.getResult());
+                    });
 
-            prefs = getSharedPreferences("prefs", MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("firstStart", false);
             editor.apply();
         }
 
-        //Firebase Cloud Messaging for PushNotification
         FirebaseMessaging.getInstance().subscribeToTopic("Notify");
 
-        //Bottom navigation bar
         BottomNavigationView bottomNav = findViewById(R.id.Main_Bottom_Navigation);
-        bottomNav.setOnItemSelectedListener(navListener);
+        if (bottomNav != null) {
+            bottomNav.setOnItemSelectedListener(item -> {
+                Fragment selectedFragment = null;
+                int itemId = item.getItemId();
+                if (itemId == R.id.nav_home) {
+                    selectedFragment = new FragmentMain();
+                    if (toolbar != null) toolbar.setVisibility(View.VISIBLE);
+                } else if (itemId == R.id.nav_profile) {
+                    selectedFragment = new FragmentProfile();
+                    if (toolbar != null) toolbar.setVisibility(View.GONE);
+                } else if (itemId == R.id.nav_help) {
+                    selectedFragment = new FragmentAbout();
+                    if (toolbar != null) toolbar.setVisibility(View.GONE);
+                }
 
-        //Navigation Drawer
-        drawer = findViewById(R.id.Main_NavView_drawer);
+                if (selectedFragment != null) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.Main_Fragment_layout,
+                            selectedFragment).commit();
+                }
+                return true;
+            });
+        }
 
-        //Toolbar support for navigationDrawer
-        toolbar =  findViewById(R.id.toolbar);
+        drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.Main_navView_drawer);
+        if (navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(this);
+        }
+
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //NavigationDrawer
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer,toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        if (drawer != null && toolbar != null) {
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
+        }
 
-        //puts account details
         SetAccountDetails();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.Main_Fragment_layout,
                     new FragmentMain()).commit();
+            if (toolbar != null) toolbar.setVisibility(View.VISIBLE);
         }
 
-        DBController dbController = new DBController(MainActivity.this);
-
-        if(dbController.isNewUser() == 0) {
-            //sending first notification to user who just installed
-            Log.d(TAG, "onCreate: "+"new User");
-            createNotificationChannel();
-            sendNotification();
-            runGetFirstActivityTask();
+        View loginFooter = findViewById(R.id.nav_login_button_container);
+        if (loginFooter != null) {
+            loginFooter.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (ACCOUNT == null) {
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    } else {
+                        Toast.makeText(MainActivity.this, "Already Logged In", Toast.LENGTH_SHORT).show();
+                    }
+                    if (drawer != null) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                }
+            });
         }
 
-        //Starting Location Service
-        //more info in the respective class
+        new Thread(() -> {
+            if (dbController.isNewUser() == 0) {
+                runOnUiThread(() -> {
+                    createNotificationChannel();
+                    sendNotification();
+                });
+                runGetFirstActivityTask();
+            }
+        }).start();
+
         locationService = new LocationService();
         locationService.Start(this, this);
 
-
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                    setEnabled(true);
+                }
+            }
+        });
     }
 
     private void runGetFirstActivityTask() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-
         executor.execute(() -> {
-            //Background work here
             try {
-                JSONObject apiCall = UsefulFunctions.UsingGetAPI("http://educationfoundation.space/spacece/api/spaceactive_activities.php?ano=1");
-                Log.d(TAG, "Object Obtained " + (apiCall != null ? apiCall.toString() : "null"));
-
+                JSONObject apiCall = UsefulFunctions.UsingGetAPI("https://hustle-7c68d043.mileswebhosting.com/spacece/api/spaceactive_activities.php?ano=1");
                 if (apiCall != null) {
-                    GsonBuilder gsonBuilder = new GsonBuilder();
-                    Gson gson = gsonBuilder.create();
+                    Gson gson = new GsonBuilder().create();
                     ActivityData activityData = gson.fromJson(apiCall.toString(), ActivityData.class);
-                    Log.d(TAG, "doInBackground: activity_dev_domain " + activityData.getData().get(0).getActivityDevDomain());
-
-                    DBController dbController = new DBController(MainActivity.this);
                     dbController.insertRecord(activityData);
-                    Log.d(TAG, "doInBackground: " + dbController.isNewUser());
                 }
-
-            } catch (RuntimeException runtimeException) {
-                Log.d(TAG, "RUNTIME EXCEPTION:::, Server did not respond");
+            } catch (Exception e) {
+                Log.e(TAG, "runGetFirstActivityTask Error", e);
             }
-
-            handler.post(() -> {
-                //UI Thread work here
-            });
         });
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(locationService != null) {
+        if (locationService != null) {
             locationService.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
-
     private void sendTokenToServer(String token) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //this is not working right now but this is to know when someone installs the app for the first time
-                UsefulFunctions.UsingGetAPI("http://educationfoundation.space/ConsultUs/api_token?email="+ACCOUNT.getAccount_id()+"&token="+token);
-            }
-        });
-        thread.start();
-
+        if (ACCOUNT != null) {
+            new Thread(() -> UsefulFunctions.UsingGetAPI("https://hustle-7c68d043.mileswebhosting.com/ConsultUs/api_token?email=" + ACCOUNT.getAccount_id() + "&token=" + token)).start();
+        }
     }
 
     private void getDetails() {
         ACCOUNT = userLocalStore.getLoggedInAccount();
     }
 
-    private boolean authenticate(){
+    private boolean authenticate() {
         return userLocalStore.getUserLoggedIn();
     }
 
     @Override
-    public void onBackPressed() {
-        if(drawer.isDrawerOpen(GravityCompat.START)){
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.nav_home) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.Main_Fragment_layout, new FragmentMain()).commit();
+            if (toolbar != null) toolbar.setVisibility(View.VISIBLE);
+        } else {
+            if (itemId == R.id.nav_about) {
+                openUrl(ABOUT_US_URL);
+            } else if (itemId == R.id.nav_terms) {
+                openUrl(TERMS_AND_CONDITIONS_URL);
+            } else if (itemId == R.id.nav_privacy) {
+                openUrl(PRIVACY_POLICY_URL);
+            } else if (itemId == R.id.nav_instagram) {
+                openUrl(INSTAGRAM_URL);
+            } else if (itemId == R.id.nav_youtube) {
+                openUrl(YOUTUBE_URL);
+            } else if (itemId == R.id.nav_facebook) {
+                openUrl(FACEBOOK_URL);
+            } else if (itemId == R.id.nav_linkedin) {
+                openUrl(LINKEDIN_URL);
+            } else if (itemId == R.id.nav_twitter) {
+                openUrl(TWITTER_URL);
+            } else if (itemId == R.id.nav_contact) {
+                openEmail();
+            } else if (itemId == R.id.nav_rate) {
+                openUrl(PLAY_STORE_URL);
+            } else if (itemId == R.id.nav_location) {
+                openMap();
+            }
+        }
+
+        if (drawer != null) {
             drawer.closeDrawer(GravityCompat.START);
-        } else{
-            super.onBackPressed();
+        }
+        return true;
+    }
+
+    private void openUrl(String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
+    }
+
+    private void openMap() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(MAP_LOCATION));
+        startActivity(intent);
+    }
+
+    private void openEmail() {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:" + CONTACT_US_EMAIL));
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "No email app found", Toast.LENGTH_SHORT).show();
         }
     }
 
-    NavigationBarView.OnItemSelectedListener navListener =
-            new NavigationBarView.OnItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    Fragment selectedFragment = null;
-
-                    int itemId = item.getItemId();
-                    if (itemId == R.id.nav_home) {
-                        selectedFragment = new FragmentMain();
-                    } else if (itemId == R.id.nav_profile) {
-                        selectedFragment = new FragmentProfile();
-                    } else if (itemId == R.id.nav_help) {
-                        selectedFragment = new FragmentAbout();
-                    }
-
-                    if (selectedFragment != null) {
-                        getSupportFragmentManager().beginTransaction().replace(R.id.Main_Fragment_layout,
-                                selectedFragment).commit();
-                    }
-
-                    return true;
-                }
-            };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-
         MenuInflater inflater = getMenuInflater();
-        if(ACCOUNT!=null){
+        if (ACCOUNT != null) {
             inflater.inflate(R.menu.options_main_activity_loggedin, menu);
-        }else {
+        } else {
             inflater.inflate(R.menu.options_main_activity, menu);
         }
         return true;
@@ -309,71 +357,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createNotificationChannel() {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            CharSequence name = "Reminder";
-            String description = "New Activity is Available";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("notify", name, importance);
-            channel.setDescription(description);
-
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+            NotificationChannel channel = new NotificationChannel("notify", "Reminder", NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription("New Activity is Available");
+            NotificationManager nm = getSystemService(NotificationManager.class);
+            if (nm != null) {
+                nm.createNotificationChannel(channel);
+            }
         }
     }
 
-    public void sendNotification(){
-
-        Log.d(TAG, "sendNotification: called");
-        //Toast.makeText(ActivitiesListActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
-
+    public void sendNotification() {
         Intent intent = new Intent(MainActivity.this, ReminderBroadCastReciever.class);
-
-        //int lastDay = dbController.isNewUser();
-
-        SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref",MODE_PRIVATE);
-
-        SharedPreferences.Editor myEdit = sharedPreferences.edit();
-
-        //myEdit.putInt("dayNo", lastDay);
-
-        myEdit.commit();
-
-
-        //make it 0 if not worked
         PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 200, intent, PendingIntent.FLAG_IMMUTABLE);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        long time = System.currentTimeMillis();
-        long tenSeconds = 1000 * 10;
+        if (alarmManager != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.set(Calendar.HOUR_OF_DAY, 8);
+            calendar.set(Calendar.MINUTE, 5);
+            calendar.set(Calendar.SECOND, 0);
 
-        Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.setTime(date);
-
-        calendar.set(Calendar.DATE,1);
-        calendar.set(Calendar.HOUR_OF_DAY,8);
-        calendar.set(Calendar.MINUTE,5);
-        calendar.set(Calendar.SECOND,0);
-
-        Log.d(TAG, "sendNotification: "+calendar.getTime());
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,pendingIntent);
-
-        Log.d(TAG, "sendNotification: "+calendar.getTimeInMillis());
-        Log.d(TAG, "sendNotification: tenSeconds "+(time+tenSeconds));
-
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        }
     }
 
     private void signOut() {
         userLocalStore.clearUserData();
         ACCOUNT = null;
         userLocalStore.setUserLoggedIn(false);
-        Intent intent = getIntent();
-        finish();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+        finish();
     }
 
-    // Removed the deprecated AsyncTask class GetFirstActivity
+    public void openDrawer() {
+        if (drawer != null) {
+            drawer.openDrawer(GravityCompat.START);
+        }
+    }
 }

@@ -1,0 +1,14 @@
+{
+  "BASE_URL": "https://hustle-7c68d043.mileswebhosting.com/spacece/",
+  "SPACETUBE_ALL": "SpacTube/api_all.php",
+  "SPACETUBE_EXTRACT_LIKE": "SpacTube/api_extractlike.php",
+  "SPACETUBE_GET_COMMENT": "SpacTube/api_getComment.php",
+  "SPACETUBE_LIKE_VIDEO": "SpacTube/api_likeVideo.php",
+  "SPACETUBE_DISLIKE_VIDEO": "SpacTube/api_dislikeVideo.php",
+  "SPACETUBE_COMMENT_VIDEO": "SpacTube/api_commentVideo.php",
+  "SPACETUBE_GET_EACH_COUNT": "SpacTube/api_getEachCount.php",
+  "SPACETUBE_UPDATE_VIEWS": "SpacTube/api_UpdateViews.php",
+  "SPACETUBE_GET_ALL_COMMENTS": "SpacTube/api_getAllComments.php",
+  "SPACETUBE_GET_ALL_COUNT": "SpacTube/api_getAllCount.php",
+  "SPACETUBE_DELETE_COMMENT": "SpacTube/api_deleteComment.php"
+}

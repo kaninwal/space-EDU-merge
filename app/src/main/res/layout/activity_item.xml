@@ -113,7 +113,7 @@
                     android:background="@android:color/transparent"
                     android:scaleType="fitCenter"
                     android:src="@drawable/arrowdown"
-                    android:tint="@color/black" />
+                    app:tint="@color/black" />
             </LinearLayout>
 
         </FrameLayout>

@@ -1,8 +1,10 @@
 package com.spacECE.spaceceedu.Authentication;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 
@@ -14,6 +16,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.spacECE.spaceceedu.MainActivity;
 import com.spacECE.spaceceedu.R;
 
+import com.spacECE.spaceceedu.Utils.UsefulFunctions;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -30,6 +33,8 @@ public class LoginActivity extends AppCompatActivity {
     TextView tv_invalid;
     ToggleButton is_Consultant;
     TextView tv_forgotPassword;
+    View menu_icon;
+    View contact_us_footer;
 
     String USER;
 
@@ -40,7 +45,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        //what is this?
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         userLocalStore = new UserLocalStore(getApplicationContext());
@@ -52,13 +56,9 @@ public class LoginActivity extends AppCompatActivity {
         tv_invalid = findViewById(R.id.TextView_InvalidCredentials);
         is_Consultant = findViewById(R.id.isConsultant);
         tv_forgotPassword = findViewById(R.id.TextView_ForgotPassword);
+        menu_icon = findViewById(R.id.menu_icon);
+        contact_us_footer = findViewById(R.id.contact_us_footer);
 
-
-
-
-
-
-//        SignInButton G_signInButton = findViewById(R.id.sign_in_button);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -66,14 +66,18 @@ public class LoginActivity extends AppCompatActivity {
         b_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if(is_Consultant != null && is_Consultant.isChecked()){
                     USER = "consultant";
                 } else {
                     USER = "customer";
                 }
-
-                logIn(et_email.getText().toString(), et_password.getText().toString());
+                String email = et_email.getText().toString().trim();
+                String password = et_password.getText().toString().trim();
+                if (email.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(LoginActivity.this, "Please enter email and password", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                logIn(email, password);
             }
         });
 
@@ -87,110 +91,132 @@ public class LoginActivity extends AppCompatActivity {
         tv_forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                 // Implement forgot password functionality or navigation here
-                 Toast.makeText(LoginActivity.this, "Forgot Password Clicked", Toast.LENGTH_SHORT).show();
+                 try {
+                     Intent intent = new Intent();
+                     intent.setClassName(getPackageName(), "com.spacece.milestonetracker.ui.activity.ForgotPasswordActivity");
+                     startActivity(intent);
+                 } catch (Exception e) {
+                     Toast.makeText(LoginActivity.this, "Reset Password screen unavailable", Toast.LENGTH_SHORT).show();
+                 }
             }
         });
 
-//        G_signInButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//            }
-//        });
+        if (menu_icon != null) {
+            menu_icon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openEmail();
+                }
+            });
+        }
 
+        if (contact_us_footer != null) {
+            contact_us_footer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openEmail();
+                }
+            });
+        }
+    }
+
+    private void openUrl(String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
+    }
+
+    private void openEmail() {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:contact@spacece.in"));
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "No email app found", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void logIn(String email, String password) {
-
-        String login = "http://spacefoundation.in/test/SpacECE-PHP/spacece_auth/login_action.php";
-
-        new Thread(new Runnable() {
-
-            JSONObject jsonObject;
+        String login = "https://hustle-7c68d043.mileswebhosting.com/spacece/spacece_auth/login_action.php";
+        OkHttpClient client = UsefulFunctions.getOkHttpClient();
+        RequestBody fromBody = new FormBody.Builder()
+                .add("email", email)
+                .add("password", password)
+                .add("type", USER)
+                .add("isAPI", "true")
+                .build();
+        Request request = new Request.Builder()
+                .url(login)
+                .post(fromBody)
+                .build();
+        
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Log.e("Login", "API Error: " + e.getMessage());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Network error: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
 
             @Override
-            public void run() {
-                OkHttpClient client = new OkHttpClient();
-                RequestBody fromBody = new FormBody.Builder()
-                        .add("email", email)
-                        .add("password", password)
-                        .add("type", USER)
-                        .add("isAPI", "true")
-                        .build();
-
-                Request request = new Request.Builder()
-                        .url(login)
-                        .post(fromBody)
-                        .build();
-
-
-                Call call = client.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        System.out.println("Registration Error ApI " + e.getMessage());
-                    }
-
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-
-                        try {
-                            jsonObject = new JSONObject(response.body().string());
-                            Log.d("Login", "onResponse: "+jsonObject);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                final String responseData = response.body() != null ? response.body().string() : null;
+                runOnUiThread(() -> {
+                    try {
+                        if (responseData == null || !response.isSuccessful()) {
+                            Toast.makeText(LoginActivity.this, "Server error: " + response.code(), Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        Log.d("Login", "Response: " + responseData);
+                        
+                        String cleanJson = responseData.trim();
+                        int jsonStart = cleanJson.indexOf("{");
+                        int jsonEnd = cleanJson.lastIndexOf("}");
+                        if (jsonStart != -1 && jsonEnd != -1 && jsonEnd > jsonStart) {
+                            cleanJson = cleanJson.substring(jsonStart, jsonEnd + 1);
                         }
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    if(jsonObject.getString("status").equals("error")) {
+                        if (!cleanJson.startsWith("{")) {
+                            Toast.makeText(LoginActivity.this, "Error: Invalid server response", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                                        Log.i("Authentication:: ", "Rejected.....");
-                                        et_email.setText("");
-                                        et_email.setError("");
-                                        et_password.setError("");
-                                        et_password.setText("");
-                                        tv_invalid.setVisibility(View.VISIBLE);
-
-                                        Toast.makeText(LoginActivity.this, "Invalid email or password!", Toast.LENGTH_SHORT).show();
-
-                                    } else if(jsonObject.getString("status").equals("success")) {
-
-                                        JSONObject object = new JSONObject(jsonObject.getString("data"));
-
-                                        Log.d("TAG", "onResponse: "+object);
-
-                                        tv_invalid.setVisibility(View.INVISIBLE);
-
-                                        if(object.getString("current_user_type").equals("consultant")){
-                                            Toast.makeText(LoginActivity.this, "Consultant!", Toast.LENGTH_SHORT).show();
-                                            userLocalStore.setUserLoggedIn(true, new Account(object.getString("current_user_id"), object.getString("current_user_name"),
-                                                    object.getString("current_user_mob"), object.getString("current_user_type").equals("consultant"),
-                                                    object.getString("current_user_image"), object.getString("consultant_category"), object.getString("consultant_office "),
-                                                    object.getString("consultant_from_time"), object.getString("consultant_to_time"), object.getString("consultant_language"),
-                                                    object.getString("consultant_fee"), object.getString("consultant_qualification")));
-                                        } else {
-                                            userLocalStore.setUserLoggedIn(true, new Account(object.getString("current_user_id"), object.getString("current_user_name"),
-                                                    object.getString("current_user_mob"), object.getString("current_user_type").equals("consultant"),
-                                                    object.getString("current_user_image")));
-                                            System.out.println(object.getString("current_user_image"));
-                                        }
-                                        MainActivity.ACCOUNT = userLocalStore.getLoggedInAccount();
-                                        finish();
-//                                        Intent goToMainPage = new Intent(getApplicationContext(), MainActivity.class);
-//                                        startActivity(goToMainPage);
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
+                        JSONObject jsonObject = new JSONObject(cleanJson);
+                        if(jsonObject.optString("status").equals("error")) {
+                            et_password.setText("");
+                            tv_invalid.setVisibility(View.VISIBLE);
+                            Toast.makeText(LoginActivity.this, jsonObject.optString("message", "Invalid email or password!"), Toast.LENGTH_SHORT).show();
+                        } else if(jsonObject.optString("status").equals("success")) {
+                            JSONObject object = jsonObject.optJSONObject("data");
+                            if (object == null) {
+                                Toast.makeText(LoginActivity.this, "Invalid response from server", Toast.LENGTH_SHORT).show();
+                                return;
                             }
-                        });
+                            tv_invalid.setVisibility(View.INVISIBLE);
+                            if(object.optString("current_user_type").equals("consultant")){
+                                userLocalStore.setUserLoggedIn(true, new Account(object.optString("current_user_id"), object.optString("current_user_name"),
+                                        object.optString("current_user_mob"), object.optString("current_user_type").equals("consultant"),
+                                        object.optString("current_user_image"), object.optString("consultant_category"), object.optString("consultant_office"),
+                                        object.optString("consultant_from_time"), object.optString("consultant_to_time"), object.optString("consultant_language"),
+                                        object.optString("consultant_fee"), object.optString("consultant_qualification")));
+                            } else {
+                                userLocalStore.setUserLoggedIn(true, new Account(object.optString("current_user_id"), object.optString("current_user_name"),
+                                        object.optString("current_user_mob"), object.optString("current_user_type").equals("consultant"),
+                                        object.optString("current_user_image")));
+                            }
+                            MainActivity.ACCOUNT = userLocalStore.getLoggedInAccount();
+                            Intent goToMainPage = new Intent(getApplicationContext(), MainActivity.class);
+                            goToMainPage.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(goToMainPage);
+                            finish();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Unexpected response from server", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        Log.e("Login", "JSON Error: " + e.getMessage() + " Response: " + responseData);
+                        Toast.makeText(LoginActivity.this, "Error parsing server response", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
-        }).start();
+        });
     }
 }

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ProgressBar;
+import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -30,7 +31,7 @@ public class Fragment_Consultant_Categories extends Fragment {
 
     private ProgressBar progressBar;
 
-    private ArrayList<ConsultantCategory> categories=new ArrayList<>();
+    private ArrayList<ConsultantCategory> categories = new ArrayList<>();
     private RecyclerView categoryRecyclerView;
     private Consultant_Categories_RecyclerAdapter adapter;
     private Consultant_Categories_RecyclerAdapter.RecyclerViewClickListener listener;
@@ -69,68 +70,74 @@ public class Fragment_Consultant_Categories extends Fragment {
     }
 
     private void setOnClickListener() {
-        listener = new Consultant_Categories_RecyclerAdapter.RecyclerViewClickListener() {
-            @Override
-            public void onClick(View v, int position) {
-                progressBar = getActivity().findViewById(R.id.Loading_Consultants);
+        listener = (v, position) -> {
+            progressBar = getActivity().findViewById(R.id.Loading_Consultants);
+            if (progressBar != null) {
                 progressBar.setVisibility(View.VISIBLE);
-                getList(categories.get(position).getCategoryName());
             }
+            getList(categories.get(position).getCategoryName());
         };
     }
 
     public void getList(String category) {
-
-        System.out.println(category);
-
-        Thread thread = new Thread(() -> {
-
+        new Thread(() -> {
             JSONObject apiCall = null;
-
-
             try {
-                try {
-                    apiCall = UsefulFunctions.UsingGetAPI("http://spacefoundation.in/test/SpacECE-PHP/ConsultUs/api_getconsultant.php?cat=" + URLEncoder.encode(category, "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                String encodedCategory = URLEncoder.encode(category, "UTF-8");
+                String url = "https://hustle-7c68d043.mileswebhosting.com/spacece/ConsultUs/api_getconsultant.php?cat=" + encodedCategory;
+                apiCall = UsefulFunctions.UsingGetAPI(url);
 
-                JSONArray jsonArray = null;
-                try {
-                    jsonArray = apiCall.getJSONArray("data");
-                    Log.i("API : ", apiCall.toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                ConsultantsLibrary.consultantsList = new ArrayList<>();
-                try {
+                if (apiCall != null && apiCall.has("data")) {
+                    JSONArray jsonArray = apiCall.getJSONArray("data");
+                    ArrayList<Consultant> newList = new ArrayList<>();
                     for (int i = 0; i < jsonArray.length(); i++) {
-
-                        JSONObject response_element = new JSONObject(String.valueOf(jsonArray.getJSONObject(i)));
-
-                        Consultant consultant = new Consultant(response_element.getString("u_name"),
-                                response_element.getString("u_id"), response_element.getString("image"),
-                                response_element.getString("cat_name"), response_element.getString("c_office"),
-                                response_element.getString("c_language"), response_element.getString("c_from_time"),
-                                response_element.getString("c_to_time"), response_element.getString("c_qualification"),
-                                response_element.getString("c_fee"));
-
-                        ConsultantsLibrary.consultantsList.add(consultant);
+                        JSONObject response_element = jsonArray.getJSONObject(i);
+                        Consultant consultant = new Consultant(
+                                response_element.optString("u_name"),
+                                response_element.optString("u_id"),
+                                response_element.optString("image"),
+                                response_element.optString("cat_name"),
+                                response_element.optString("c_office"),
+                                response_element.optString("c_language"),
+                                response_element.optString("c_from_time"),
+                                response_element.optString("c_to_time"),
+                                response_element.optString("c_qualification"),
+                                response_element.optString("c_fee"));
+                        newList.add(consultant);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    
+                    ConsultantsLibrary.consultantsList = newList;
+
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            if (progressBar != null) {
+                                progressBar.setVisibility(View.INVISIBLE);
+                            }
+                            Intent intent = new Intent(getContext(), ConsultantsLibrary.class);
+                            startActivity(intent);
+                        });
+                    }
+                } else {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            if (progressBar != null) {
+                                progressBar.setVisibility(View.INVISIBLE);
+                            }
+                            Toast.makeText(getContext(), "No consultants found for " + category, Toast.LENGTH_SHORT).show();
+                        });
+                    }
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        if (progressBar != null) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+                        Toast.makeText(getContext(), "Error fetching data", Toast.LENGTH_SHORT).show();
+                    });
+                }
             }
-            Intent intent = new Intent(getContext(), ConsultantsLibrary.class);
-            progressBar.setVisibility(View.INVISIBLE);
-            startActivity(intent);
-        });
-
-        thread.start();
-
+        }).start();
     }
-
 }

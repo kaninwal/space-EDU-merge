@@ -37,8 +37,12 @@
                 android:textStyle="bold" />
 
             <LinearLayout
+                android:id="@+id/profile_hamburger_menu"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:gravity="center">
 
                 <View
@@ -71,6 +75,7 @@
 
             <!-- Profile Image Placeholder -->
             <ImageView
+                android:id="@+id/child_profile_image"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_gravity="center_horizontal"
@@ -117,12 +122,15 @@
                 android:orientation="horizontal">
 
                 <EditText
+                    android:id="@+id/child_profile_image_path"
                     style="@style/ProfileInput"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:hint="Filed Entry" />
+                    android:hint="Filed Entry"
+                    android:focusable="false" />
 
                 <Button
+                    android:id="@+id/child_profile_upload_button"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_marginStart="8dp"
@@ -340,10 +348,14 @@
                 android:textSize="16sp"/>
 
             <LinearLayout
+                android:id="@+id/profile_contact_us_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
                 android:layout_marginTop="56dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="4dp">

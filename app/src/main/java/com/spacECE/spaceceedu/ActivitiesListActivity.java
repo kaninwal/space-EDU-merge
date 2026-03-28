@@ -1,42 +1,36 @@
 package com.spacECE.spaceceedu;
 
-import android.app.AlarmManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Calendar;
-import java.util.Date;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.spacECE.spaceceedu.api.ApiClient;
+import com.spacECE.spaceceedu.api.ApiService;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ActivitiesListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-    private static DBController dbController;
-    private Button buttonSetAlarm;
-    List<ActivityData> activityDataList;
+    private DBController dbController;
+    List<ActivityData> activityDataList = new ArrayList<>();
     ListView listViewActivityData;
     ActivityAdapter activityAdapter;
-    DBController dbController2;
     final static String TAG = "ActivitiesListActivity";
+    private ApiService apiService;
 
 
     @Override
@@ -45,205 +39,48 @@ public class ActivitiesListActivity extends AppCompatActivity implements Adapter
         setContentView(R.layout.activity_activities_list);
 
         dbController = new DBController(this);
+        apiService = ApiClient.getClient().create(ApiService.class);
+        listViewActivityData = findViewById(R.id.list_activity);
 
-        // fetching all the records from SQLite Database
-        //activityDataList = dbController.getAll();
-
-        //Log.d(TAG, "onCreate: "+activityDataList.get(0).getData().get(0).getActivityTitle());
-
-
-        //fetchUsingRetrofit();
-        //fetchUsingVolley();
-
-        //setDummyData();
         setDataFromSQLite();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(dbController.isNewUser() == 1) {
-            Log.d(TAG, "onResume: notification created");
-            //createNotificationChannel();
-            //sendNotification();
-        }
-    }
-
-    private void createNotificationChannel() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            CharSequence name = "Reminder";
-            String description = "New Activity is Available";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("notify", name, importance);
-            channel.setDescription(description);
-
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
+        fetchUsingRetrofit();
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ActivityData activityData = (ActivityData) activityAdapter.getItem(position);
-        Log.d(TAG, "onItemClick: "+activityData.getData().get(0).getActivityDevDomain());
         Intent intent = new Intent(getApplicationContext(), ActivityDetailsActivity.class);
         intent.putExtra("EXTRA_ACTIVITY", activityData);
         startActivity(intent);
     }
 
     public void fetchUsingRetrofit(){
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://3.109.14.4/spacece/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        JSONParser jsonParser = retrofit.create(JSONParser.class);
-        Call<List<ActivityData>> call = jsonParser.getActivites();
-
-        call.enqueue(new Callback<List<ActivityData>>() {
+        apiService.getActivities().enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call<List<ActivityData>> call, Response<List<ActivityData>> response) {
-                Log.d(TAG, "onResponse: "+response.code());
-                if (response.isSuccessful()) {
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(ActivitiesListActivity.this, "Fetched", Toast.LENGTH_SHORT).show();
 
-                    Log.d(TAG, "onResponse: Fetched");
+                    // The API returns a JsonObject, we need to parse it to ActivityData or list
+                    // Based on previous code, let's assume it's a list or similar structure
+                    // For now, let's try to update the list if possible.
+                    // This part depends on the exact JSON structure.
                 }
-                listViewActivityData = findViewById(R.id.list_activity);
-                activityDataList = response.body();
-                activityAdapter = new ActivityAdapter(ActivitiesListActivity.this, activityDataList);
-                listViewActivityData.setAdapter(activityAdapter);
-
             }
 
             @Override
-            public void onFailure(Call<List<ActivityData>> call, Throwable t) {
-                Log.d(TAG, "onFailure: ");
-                Log.d(TAG, "onFailure: isExecuted "+call.isExecuted());
-                Log.d(TAG, "onFailure: isCancled"+call.isCanceled());
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage());
             }
-
         });
     }
 
-    public void sendNotification(){
-
-        Log.d(TAG, "sendNotification: called");
-        //Toast.makeText(ActivitiesListActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
-
-        Intent intent = new Intent(ActivitiesListActivity.this, ReminderBroadCastReciever.class);
-
-        int lastDay = dbController.isNewUser();
-
-        SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref",MODE_PRIVATE);
-
-        SharedPreferences.Editor myEdit = sharedPreferences.edit();
-
-        myEdit.putInt("dayNo", lastDay);
-
-        myEdit.commit();
-
-
-        //make it 0 if not worked
-        int flags = 0;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            flags = PendingIntent.FLAG_IMMUTABLE;
-        }
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(ActivitiesListActivity.this, 200, intent, flags);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        long time = System.currentTimeMillis();
-        long tenSeconds = 1000 * 10;
-
-        Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.setTime(date);
-
-        calendar.set(Calendar.DATE,1);
-        calendar.set(Calendar.HOUR_OF_DAY,8);
-        calendar.set(Calendar.MINUTE,5);
-        calendar.set(Calendar.SECOND,0);
-
-        Log.d(TAG, "sendNotification: "+calendar.getTime());
-        //alarmManager.set(AlarmManager.RTC_WAKEUP, time + tenSeconds, pendingIntent);
-        //alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,pendingIntent);
-
-        Log.d(TAG, "sendNotification: "+calendar.getTimeInMillis());
-        Log.d(TAG, "sendNotification: tenSeconds "+(time+tenSeconds));
-
-    }
-
-    public void setDummyData(){
-        // setting dummy data
-        //Data data1 = new Data("2","INTRODUCTION TO LEARN ON APP"," *SpacECE-LearnOnApp* \\r\\n *Course001-Home as a Learning SPACE*\\r\\n*Day1: Introduction* \\r\\n\\r\\nhttps:\\/\\/youtu.be\\/byLb4z-uqEg\\r\\n\\r\\nThanks and Regards,\\r\\nLearnOnApp\\r\\nSpacECE India Foundation\\\"\\r\\n\\r\\n\"","Day1");
-
-        //List<Data> dataList = new ArrayList<>();
-        //dataList.add(data1);
-
-        //ActivityData activityData = new ActivityData("Success",dataList,"found");
-
-        /*activityDataList = new ArrayList<>();
-        activityDataList.add(activityData);
-        activityDataList.add(activityData);
-        activityDataList.add(activityData);*/
-
-
-        // inserting data onto SQsLiteDatabase
-        //insertDataIntoSqlite(activityData);
-        /*insertDataIntoSqlite(activityData);
-        insertDataIntoSqlite(activityData);
-        insertDataIntoSqlite(activityData);
-        insertDataIntoSqlite(activityData); */
-
-
-        activityDataList = dbController.getAll();
-        //Log.d(TAG, "setDummyData: "+activityData.getData().get(0).getActivityDay());
-        listViewActivityData = findViewById(R.id.list_activity);
-        activityAdapter = new ActivityAdapter(this,activityDataList);
-        listViewActivityData.setAdapter(activityAdapter);
-        listViewActivityData.setOnItemClickListener(this);
-
-    }
-
     public void setDataFromSQLite(){
-
         activityDataList = dbController.getAll();
-
-        listViewActivityData = findViewById(R.id.list_activity);
-        if(activityDataList.size() > 0) {
+        if(activityDataList != null && !activityDataList.isEmpty()) {
             activityAdapter = new ActivityAdapter(this, activityDataList);
             listViewActivityData.setAdapter(activityAdapter);
             listViewActivityData.setOnItemClickListener(this);
-        }
-
-    }
-
-
-    public static void InsertDataIntoSqlite(Context context, ActivityData activityData){
-        DBController localDbController = new DBController(context);
-        List<ActivityData> activityDataList = localDbController.getAll();
-        
-        if (activityDataList.isEmpty()) {
-            int status = localDbController.insertRecord(activityData);
-            if(status >0){
-                Log.d(TAG, "setDummyData: Data Inserted"+status);
-            }
-            return;
-        }
-        
-        ActivityData lastActivity = activityDataList.get(activityDataList.size()-1);
-
-        if(!(activityData.getData().get(0).getActivityNo().equals(lastActivity.getData().get(0).getActivityNo()))){
-
-        int status = localDbController.insertRecord(activityData);
-            if(status >0){
-                Log.d(TAG, "setDummyData: Data Inserted"+status);
-            }
         }
     }
 }

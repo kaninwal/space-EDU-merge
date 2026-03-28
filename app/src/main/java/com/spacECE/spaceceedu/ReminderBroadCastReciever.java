@@ -4,10 +4,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -24,26 +21,33 @@ import java.util.concurrent.Executors;
 
 public class ReminderBroadCastReciever extends BroadcastReceiver {
 
-    final String TAG = "ReminderBroadCastReceiver";
+    private static final String TAG = "ReminderBroadCastReceiver";
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        // Move all work to background to avoid blocking main thread (potential ANR or System UI lag)
+        executor.execute(() -> {
+            DBController dbController = DBController.getInstance(context);
+            ActivityData lastActivity = dbController.getLastActivity();
 
-        DBController dbController = new DBController(context);
-        ActivityData lastActivity = dbController.getLastActivity();
+            if (lastActivity == null || lastActivity.getData() == null || lastActivity.getData().isEmpty()) {
+                Log.d(TAG, "onReceive: No valid activity data found, skipping notification.");
+                // Even if no data, we might want to fetch one for next time
+                int dayNo = dbController.isNewUser() + 1;
+                runGetRecentActivityTask(context, dayNo);
+                return;
+            }
 
-        // More robust check: ensure lastActivity and its data are not null or empty
-        if (lastActivity == null || lastActivity.getData() == null || lastActivity.getData().isEmpty()) {
-            Log.d(TAG, "onReceive: No valid activity data found, skipping notification.");
-            return;
-        }
+            int dayNo = dbController.isNewUser() + 1;
+            Log.d(TAG, "onReceive: day" + dayNo);
+            runGetRecentActivityTask(context, dayNo);
 
-        int dayNo = dbController.isNewUser();
-        dayNo++;
+            showNotification(context, lastActivity);
+        });
+    }
 
-        Log.d(TAG, "onReceive: day" + dayNo);
-        runGetRecentActivityTask(context, dayNo);
-
+    private void showNotification(Context context, ActivityData lastActivity) {
         String activityNo = lastActivity.getData().get(0).getActivityNo();
         String activityName = lastActivity.getData().get(0).getActivityName();
 
@@ -51,9 +55,9 @@ public class ReminderBroadCastReciever extends BroadcastReceiver {
         repeatingIntent.putExtra("EXTRA_ACTIVITY", lastActivity);
         repeatingIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        int flags = 0;
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            flags = PendingIntent.FLAG_IMMUTABLE;
+            flags |= PendingIntent.FLAG_IMMUTABLE;
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 200, repeatingIntent, flags);
 
@@ -62,38 +66,34 @@ public class ReminderBroadCastReciever extends BroadcastReceiver {
                 .setContentIntent(pendingIntent)
                 .setContentTitle("SpaceActive - Activity " + activityNo)
                 .setContentText(activityName)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
-        notificationManagerCompat.notify(200, builder.build());
-        Log.d(TAG, "onReceive:notification sent ");
+        try {
+            notificationManagerCompat.notify(200, builder.build());
+            Log.d(TAG, "onReceive: notification sent");
+        } catch (SecurityException e) {
+            Log.e(TAG, "Notification permission missing", e);
+        }
     }
 
     private void runGetRecentActivityTask(Context context, int dayNo) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
+        try {
+            // Note: Using https and the correct domain to avoid UnknownHostException
+            JSONObject apiCall = UsefulFunctions.UsingGetAPI("https://hustle-7c68d043.mileswebhosting.com/spacece/api/spaceactive_activities.php?ano=" + dayNo);
+            Log.d(TAG, "Object Obtained " + (apiCall != null ? apiCall.toString() : "null"));
 
-        executor.execute(() -> {
-            //Background work here
-            try {
-                JSONObject apiCall = UsefulFunctions.UsingGetAPI("http://educationfoundation.space/spacece/api/spaceactive_activities.php?ano=" + dayNo);
-                Log.d(TAG, "Object Obtained " + (apiCall != null ? apiCall.toString() : "null"));
-
-                if (apiCall != null) {
-                    GsonBuilder gsonBuilder = new GsonBuilder();
-                    Gson gson = gsonBuilder.create();
-                    ActivityData activityData = gson.fromJson(apiCall.toString(), ActivityData.class);
-                    if (activityData != null && activityData.getData() != null && !activityData.getData().isEmpty()) {
-                        ActivitiesListActivity.InsertDataIntoSqlite(context, activityData);
-                    }
+            if (apiCall != null) {
+                Gson gson = new GsonBuilder().create();
+                ActivityData activityData = gson.fromJson(apiCall.toString(), ActivityData.class);
+                if (activityData != null && activityData.getData() != null && !activityData.getData().isEmpty()) {
+                    DBController dbController = DBController.getInstance(context);
+                    dbController.insertRecord(activityData);
                 }
-            } catch (RuntimeException runtimeException) {
-                Log.d(TAG, "RUNTIME EXCEPTION:::, Server did not respond");
             }
-
-            handler.post(() -> {
-                //UI Thread work here
-            });
-        });
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching recent activity", e);
+        }
     }
 }

@@ -3,15 +3,13 @@ package com.spacECE.spaceceedu.Authentication;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.spacECE.spaceceedu.Authentication.Account;
-
 public class UserLocalStore {
 
     public static final String DETAILS = "UserDetails";
-    SharedPreferences userLocalDatabase;
+    private final SharedPreferences userLocalDatabase;
 
     public UserLocalStore(Context context) {
-        userLocalDatabase = context.getSharedPreferences(DETAILS, 0);
+        userLocalDatabase = context.getSharedPreferences(DETAILS, Context.MODE_PRIVATE);
     }
 
     public Account getLoggedInAccount() {
@@ -22,56 +20,53 @@ public class UserLocalStore {
         String profile_pic = userLocalDatabase.getString("profile_pic", null);
         boolean isConsultant = userLocalDatabase.getBoolean("isConsultant", false);
 
-        Account account = new Account(account_id, name, contact_number,isConsultant,profile_pic);
+        if (account_id == null) {
+            return null;
+        }
+
+        Account account = new Account(account_id, name, contact_number, isConsultant, profile_pic);
+        account.setuId(UID);
+        
+        if (isConsultant) {
+            // Note: Account class doesn't have setters for these, but they are stored in SharedPreferences.
+            // If needed, the Account class could be updated to hold these values when retrieved.
+        }
+        
         return account;
     }
 
     public void setUserLoggedIn(boolean loggedIn, Account account) {
         SharedPreferences.Editor spEditor = userLocalDatabase.edit();
-        if(account.isCONSULTANT()){
-            spEditor.putBoolean("loggedIn", loggedIn);
+        spEditor.putBoolean("loggedIn", loggedIn);
+        if (account != null) {
             spEditor.putString("account_id", account.getAccount_id());
             spEditor.putString("username", account.getUsername());
             spEditor.putString("contact_number", account.getContact_number());
             spEditor.putString("UID", account.getuId());
             spEditor.putBoolean("isConsultant", account.isCONSULTANT());
             spEditor.putString("profile_pic", account.getProfile_pic());
-            spEditor.putString("consultant_category", account.getConsultant_Category());
-            spEditor.putString("consultant_office", account.getConsultant_Office());
-            spEditor.putString("consultant_start_time", account.getConsultant_StartTime());
-            spEditor.putString("consultant_end_time", account.getConsultant_Language());
-            spEditor.putString("consultant_fee", account.getConsultant_Fee());
-            spEditor.putString("consultant_qualification", account.getConsultant_Qualification());
-            spEditor.commit();
-        } else {
-            spEditor.putBoolean("loggedIn", loggedIn);
-            spEditor.putString("account_id", account.getAccount_id());
-            spEditor.putString("username", account.getUsername());
-            spEditor.putString("contact_number", account.getContact_number());
-            spEditor.putString("UID", account.getuId());
-            spEditor.putBoolean("isConsultant", account.isCONSULTANT());
-            spEditor.putString("profile_pic", account.getProfile_pic());
-            spEditor.commit();
-        }
 
+            if (account.isCONSULTANT()) {
+                spEditor.putString("consultant_category", account.getConsultant_Category());
+                spEditor.putString("consultant_office", account.getConsultant_Office());
+                spEditor.putString("consultant_start_time", account.getConsultant_StartTime());
+                spEditor.putString("consultant_end_time", account.getConsultant_EndTime());
+                spEditor.putString("consultant_fee", account.getConsultant_Fee());
+                spEditor.putString("consultant_qualification", account.getConsultant_Qualification());
+            }
+        }
+        spEditor.apply();
     }
 
     public void setUserLoggedIn(boolean loggedIn) {
-        SharedPreferences.Editor spEditor = userLocalDatabase.edit();
-        spEditor.putBoolean("loggedIn", loggedIn);
-        spEditor.commit();
+        userLocalDatabase.edit().putBoolean("loggedIn", loggedIn).apply();
     }
 
     public void clearUserData() {
-        SharedPreferences.Editor spEditor = userLocalDatabase.edit();
-        spEditor.clear();
-        spEditor.commit();
+        userLocalDatabase.edit().clear().apply();
     }
-    public boolean getUserLoggedIn(){
-        if(userLocalDatabase.getBoolean("loggedIn", false)==true){
-            return true;
-        }
-        return false;
+
+    public boolean getUserLoggedIn() {
+        return userLocalDatabase.getBoolean("loggedIn", false);
     }
 }
-

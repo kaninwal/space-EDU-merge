@@ -21,8 +21,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.spacECE.spaceceedu.MainActivity;
 import com.spacECE.spaceceedu.R;
 
 import com.spacECE.spaceceedu.Utils.UsefulFunctions;
@@ -40,17 +42,17 @@ public class RegistrationFinal extends AppCompatActivity {
 
     private Button b_register;
     private ImageView iv_profile_pic;
-    private EditText ev_email,ev_phoneNo,ev_password, ev_re_password,ev_name;
-    private boolean imageUpload=false;
+    private EditText ev_email, ev_phoneNo, ev_password, ev_re_password, ev_name;
+    private TextView tv_login;
+    private boolean imageUpload = false;
     private static final int PERMISSION_CODE = 1001;
-    private Uri picData= Uri.parse(String.valueOf(R.drawable.default_profilepic));
+    private Uri picData = null;
     Toolbar toolbar;
     UserLocalStore userLocalStore;
 
     String TYPE = "customer", LANGUAGE, ADDRESS, FEE,
             QUALIFICATION, START_TIME, END_TIME;
 
-    // Use ActivityResultLauncher instead of startActivityForResult (Deprecated)
     ActivityResultLauncher<Intent> imagePickLauncher;
 
 
@@ -61,16 +63,16 @@ public class RegistrationFinal extends AppCompatActivity {
 
         userLocalStore = new UserLocalStore(getApplicationContext());
 
-        b_register= findViewById(R.id.UserRegistration_Button_Signup);
-        iv_profile_pic= findViewById(R.id.UserRegistration_ImageView_ProfilePic);
+        b_register = findViewById(R.id.UserRegistration_Button_Signup);
+        iv_profile_pic = findViewById(R.id.UserRegistration_ImageView_ProfilePic);
 
-        ev_email=findViewById(R.id.UserRegistration_editTextText_Email);
-        ev_password=findViewById(R.id.UserRegistration_editTextText_Password);
-        ev_re_password =findViewById(R.id.UserRegistration_editTextText_Re_Password);
-        ev_name=findViewById(R.id.UserRegistration_editTextText_Name);
-        ev_phoneNo=findViewById(R.id.UserRegistration_editTextText_PhoneNumber);
+        ev_email = findViewById(R.id.UserRegistration_editTextText_Email);
+        ev_password = findViewById(R.id.UserRegistration_editTextText_Password);
+        ev_re_password = findViewById(R.id.UserRegistration_editTextText_Re_Password);
+        ev_name = findViewById(R.id.UserRegistration_editTextText_Name);
+        ev_phoneNo = findViewById(R.id.UserRegistration_editTextText_PhoneNumber);
+        tv_login = findViewById(R.id.TextView_Register);
 
-        //Initialize the launcher
         imagePickLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
@@ -81,49 +83,35 @@ public class RegistrationFinal extends AppCompatActivity {
                             b_register.setText("Register");
                             picData = data.getData();
                             iv_profile_pic.setImageURI(picData);
+                            imageUpload = true;
                         }
                     }
                 }
         );
 
-
-        //Intent and shit
-
         Intent intent = getIntent();
+        if (intent.hasExtra("Type")) {
+            TYPE = intent.getStringExtra("Type");
+            LANGUAGE = intent.getStringExtra("Language");
+            ADDRESS = intent.getStringExtra("Address");
+            FEE = intent.getStringExtra("Fee");
+            QUALIFICATION = intent.getStringExtra("Qualification");
+            START_TIME = intent.getStringExtra("StartTime");
+            END_TIME = intent.getStringExtra("EndTime");
+        }
 
-        TYPE = intent.getStringExtra("Type");
-        LANGUAGE = intent.getStringExtra("Language");
-        ADDRESS = intent.getStringExtra("Address");
-        FEE = intent.getStringExtra("Fee");
-        QUALIFICATION = intent.getStringExtra("Qualification");
-        START_TIME = intent.getStringExtra("StartTime");
-        END_TIME = intent.getStringExtra("EndTime");
-
-        Log.d("TAG", "onCreate: "+TYPE+" "+LANGUAGE+" "+ADDRESS+" "+FEE+" "+
-                QUALIFICATION+" "+START_TIME+" "+END_TIME);
-
-
-
-        //OnClickListener:
         iv_profile_pic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //check runtime permission
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                            == PackageManager.PERMISSION_DENIED){
-                        //permission not granted, request it.
+                            == PackageManager.PERMISSION_DENIED) {
                         String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
-                        //show popup for runtime permission
                         requestPermissions(permissions, PERMISSION_CODE);
-                    }
-                    else {
-                        //permission already granted
+                    } else {
                         pickImageFromGallery();
                     }
-                }
-                else {
-                    //system os is less than marshmallow
+                } else {
                     pickImageFromGallery();
                 }
 
@@ -133,11 +121,10 @@ public class RegistrationFinal extends AppCompatActivity {
         b_register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if (validateData()) {
                     try {
-                        if(validTime(START_TIME, END_TIME)) {
-                            sendUserRegistration( ev_name.getText().toString(), ev_email.getText().toString(),
+                        if (validTime(START_TIME, END_TIME)) {
+                            sendUserRegistration(ev_name.getText().toString(), ev_email.getText().toString(),
                                     ev_password.getText().toString(), ev_phoneNo.getText().toString(), picData);
                         } else {
                             Toast.makeText(getApplicationContext(), "End Time must be greater than Start Time", Toast.LENGTH_LONG).show();
@@ -148,17 +135,36 @@ public class RegistrationFinal extends AppCompatActivity {
                 } else {
                     Toast.makeText(getApplicationContext(), "Check Details", Toast.LENGTH_LONG).show();
                 }
-
             }
         });
 
+        if (tv_login != null) {
+            tv_login.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(RegistrationFinal.this, LoginActivity.class));
+                    finish();
+                }
+            });
+        }
 
+        View contactUs = findViewById(R.id.CantactUs);
+        if (contactUs != null) {
+            contactUs.setOnClickListener(v -> openEmail());
+        }
+    }
 
-
+    private void openEmail() {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:contact@spacece.in"));
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "No email app found", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void pickImageFromGallery() {
-        //intent to pick image
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         imagePickLauncher.launch(intent);
@@ -167,33 +173,25 @@ public class RegistrationFinal extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSION_CODE: {
-                if (grantResults.length > 0 && grantResults[0] ==
-                        PackageManager.PERMISSION_GRANTED) {
-                    //permission was granted
-                    pickImageFromGallery();
-                } else {
-                    //permission was denied
-                    Toast.makeText(this, "Permission denied...!", Toast.LENGTH_SHORT).show();
-                }
+        if (requestCode == PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                pickImageFromGallery();
+            } else {
+                Toast.makeText(this, "Permission denied...!", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    // onActivityResult is removed as we use ActivityResultLauncher now.
-
     private boolean validTime(String fromTime, String endTime) throws ParseException {
-        if(fromTime == null & endTime == null) {
+        if (fromTime == null || endTime == null) {
             return true;
         } else {
-            return UsefulFunctions.DateFunc.StringToTime(fromTime+":00").before(UsefulFunctions.DateFunc.StringToTime(endTime+":00"));
+            return UsefulFunctions.DateFunc.StringToTime(fromTime + ":00").before(UsefulFunctions.DateFunc.StringToTime(endTime + ":00"));
         }
     }
 
     private Bitmap getBitmapFromUri(Uri uri) throws IOException {
-        ParcelFileDescriptor parcelFileDescriptor =
-                getContentResolver().openFileDescriptor(uri, "r");
+        ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
         FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
         Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
         parcelFileDescriptor.close();
@@ -203,223 +201,181 @@ public class RegistrationFinal extends AppCompatActivity {
     public static byte[] encodeBase64(Bitmap image) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
-        byte[] encoded = byteArrayOutputStream.toByteArray();
-        return encoded;
+        return byteArrayOutputStream.toByteArray();
     }
 
-    private void sendUserRegistration(String name, String email, String password, String phone, Uri image){
-
-        String register = "http://spacefoundation.in/test/SpacECE-PHP/spacece_auth/register_action.php";
+    private void sendUserRegistration(String name, String email, String password, String phone, Uri image) {
+        String register = "https://hustle-7c68d043.mileswebhosting.com/spacece/spacece_auth/register_action.php";
 
         new Thread(new Runnable() {
-
-            JSONObject jsonObject;
-            Bitmap selectedImage;
-            byte[] encodedImage = {5};
-
-
             @Override
             public void run() {
-
-                try {
-                    selectedImage = getBitmapFromUri(image);
-                    encodedImage = encodeBase64(selectedImage);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if(encodedImage.length == 1){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(!imageUpload){
-                                Toast.makeText(getApplicationContext(), "Upload Image", Toast.LENGTH_SHORT).show();
-                                b_register.setText("Continue without Image!");
-                                imageUpload = true;
-                            }
-                        }
-                    });
-                    if(!imageUpload){
-                        return;
+                byte[] encodedImage = null;
+                if (image != null) {
+                    try {
+                        Bitmap selectedImage = getBitmapFromUri(image);
+                        encodedImage = encodeBase64(selectedImage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-
                 }
 
-                System.out.println("hello");
+                OkHttpClient client = UsefulFunctions.getOkHttpClient();
+                MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                        .addFormDataPart("name", name)
+                        .addFormDataPart("email", email)
+                        .addFormDataPart("password", password)
+                        .addFormDataPart("phone", phone);
 
-                OkHttpClient client = new OkHttpClient();
-                RequestBody fromBody;
+                if (encodedImage != null) {
+                    builder.addFormDataPart("image", name + ".jpg",
+                            RequestBody.create(encodedImage, MediaType.parse("image/jpeg")));
+                }
 
-                // Use RequestBody.create with byte[] directly, avoiding deprecated create(MediaType, byte[]) if possible
-                // However, OkHttp 3.x vs 4.x changes this. In 4.x it is create(byte[], MediaType).
-                // To be safe with deprecation warnings and cross-version compatibility:
-                // We use RequestBody.create(MediaType, byte[]) which is standard in OkHttp 3.
-                // If using OkHttp 4.x, the order is swapped or it's an extension function in Kotlin.
-                // Since this is Java and likely OkHttp 4 (based on build.gradle), the deprecated warning exists.
-                // The correct replacement for Java in OkHttp 4.x is RequestBody.create(bytes, MediaType)
-                // BUT the library signature might confuse the compiler or previous versions.
-                // Let's try the modern order: create(byte[], MediaType) if valid, or just suppress/ignore if it's just a warning.
-                // Given the warning log: "create(MediaType,byte[]) ... has been deprecated",
-                // The new signature is create(byte[], MediaType).
-                
-                MediaType mediaType = MediaType.parse("image/*jpg");
-
-                if(TYPE != null & LANGUAGE != null & ADDRESS != null & FEE != null
-                        & QUALIFICATION != null & START_TIME != null & END_TIME != null) {
-                    fromBody = new MultipartBody.Builder()
-                            .setType(MultipartBody.FORM)
-                            .addFormDataPart("name", name)
-                            .addFormDataPart("email", email)
-                            .addFormDataPart("password", password)
-                            .addFormDataPart("phone", phone)
-                            .addFormDataPart("image", name+".jpg",
-                                    RequestBody.create(encodedImage, mediaType)) // Swapped for OkHttp 4.x
-                            .addFormDataPart("type", "consultant")
+                if (TYPE != null && TYPE.equalsIgnoreCase("consultant")) {
+                    builder.addFormDataPart("type", "consultant")
                             .addFormDataPart("c_categories", TYPE)
-                            .addFormDataPart("c_office", ADDRESS)
-                            .addFormDataPart("c_from_time", START_TIME)
-                            .addFormDataPart("c_to_time", END_TIME)
-                            .addFormDataPart("c_language", LANGUAGE)
-                            .addFormDataPart("c_fee", FEE)
+                            .addFormDataPart("c_office", ADDRESS != null ? ADDRESS : "")
+                            .addFormDataPart("c_from_time", START_TIME != null ? START_TIME : "")
+                            .addFormDataPart("c_to_time", END_TIME != null ? END_TIME : "")
+                            .addFormDataPart("c_language", LANGUAGE != null ? LANGUAGE : "")
+                            .addFormDataPart("c_fee", FEE != null ? FEE : "")
                             .addFormDataPart("c_available_from", "Monday")
                             .addFormDataPart("c_available_to", "Tuesday")
-                            .addFormDataPart("c_qualification", QUALIFICATION)
-                            .build();
+                            .addFormDataPart("c_qualification", QUALIFICATION != null ? QUALIFICATION : "");
                 } else {
-                    fromBody = new MultipartBody.Builder()
-                            .setType(MultipartBody.FORM)
-                            .addFormDataPart("name", name)
-                            .addFormDataPart("email", email)
-                            .addFormDataPart("password", password)
-                            .addFormDataPart("phone", phone)
-                            .addFormDataPart("image", name+".jpg",
-                                    RequestBody.create(encodedImage, mediaType)) // Swapped for OkHttp 4.x
-                            .addFormDataPart("type", "customer")
-                            .build();
+                    builder.addFormDataPart("type", "customer");
                 }
 
                 Request request = new Request.Builder()
                         .url(register)
-                        .post(fromBody)
+                        .post(builder.build())
                         .build();
 
-                Call call = client.newCall(request);
-
-                call.enqueue(new Callback() {
+                client.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        System.out.println("Registration Error ApI " + e.getMessage());
+                        Log.e("Registration", "Error: " + e.getMessage());
+                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Network error: " + e.getMessage(), Toast.LENGTH_LONG).show());
                     }
 
                     @Override
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-
-                        try {
-                            jsonObject = new JSONObject(response.body().string());
-                            Log.d("TAG", "onResponse: "+jsonObject);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-
-                                try {
-                                    Log.d("TAG", "onResponse: "+jsonObject.getString("status"));
-                                    if(jsonObject.getString("status").equals("error")) {
-                                        if(jsonObject.getString("message").equals("Email already exists!")) {
-                                            ev_email.setError("Email already exist!");
-                                        } else {
-                                            Toast.makeText(getApplicationContext(), "Please try after some time!", Toast.LENGTH_SHORT).show();
-                                        }
-                                    } else if(jsonObject.getString("status").equals("success")) {
-
-                                        Toast.makeText(getApplicationContext(), "Welcome to SpacECE Login to Continue!", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                                        startActivity(intent);
-
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                        final String responseData = response.body() != null ? response.body().string() : null;
+                        runOnUiThread(() -> {
+                            try {
+                                if (responseData == null || !response.isSuccessful()) {
+                                    Toast.makeText(getApplicationContext(), "Server error: " + response.code(), Toast.LENGTH_SHORT).show();
+                                    return;
                                 }
+                                Log.d("Registration", "Response: " + responseData);
+                                
+                                // Clean the response string if it contains HTML or extra spaces
+                                String cleanJson = responseData.trim();
+                                
+                                // Find the first { and last } to extract JSON even if there's surrounding garbage
+                                int jsonStart = cleanJson.indexOf("{");
+                                int jsonEnd = cleanJson.lastIndexOf("}");
+                                if (jsonStart != -1 && jsonEnd != -1 && jsonEnd > jsonStart) {
+                                    cleanJson = cleanJson.substring(jsonStart, jsonEnd + 1);
+                                }
+
+                                if (!cleanJson.startsWith("{")) {
+                                    Toast.makeText(getApplicationContext(), "Server error: Invalid response format", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                
+                                JSONObject jsonObject = new JSONObject(cleanJson);
+
+                                if (jsonObject.optString("status").equals("error")) {
+                                    if (jsonObject.optString("message").equals("Email already exists!")) {
+                                        ev_email.setError("Email already exist!");
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), jsonObject.optString("message", "Registration failed"), Toast.LENGTH_SHORT).show();
+                                    }
+                                } else if (jsonObject.optString("status").equals("success")) {
+                                    Toast.makeText(getApplicationContext(), "Registration successful!", Toast.LENGTH_SHORT).show();
+
+                                    // Save user data locally so header doesn't show "Hello null"
+                                    JSONObject data = jsonObject.optJSONObject("data");
+                                    String userId = (data != null) ? data.optString("current_user_id", "") : "";
+                                    String userName = (data != null) ? data.optString("current_user_name", name) : name;
+                                    Account account = new Account(userId, userName, phone, TYPE.equalsIgnoreCase("consultant"), "");
+                                    userLocalStore.setUserLoggedIn(true, account);
+                                    MainActivity.ACCOUNT = account;
+
+                                    // Redirect to MainActivity after successful registration
+                                    Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
+                                    mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(mainIntent);
+                                    finish();
+                                }
+                            } catch (JSONException e) {
+                                Log.e("Registration", "JSON Error: " + e.getMessage() + " Response: " + responseData);
+                                Toast.makeText(getApplicationContext(), "Error parsing response: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
                 });
             }
         }).start();
-
     }
-
 
     private boolean validateData() {
-        validateName();
-        validatePhone();
-        validateEmail();
-        validatePass();
-        validateRepass();
-
-        if(validateEmail() && validateName() && validatePass()
-                && validateRepass() && validatePhone()) {
-            return true;
-        }
-        return false;
+        boolean vName = validateName();
+        boolean vPhone = validatePhone();
+        boolean vEmail = validateEmail();
+        boolean vPass = validatePass();
+        boolean vRepass = validateRepass();
+        return vName && vPhone && vEmail && vPass && vRepass;
     }
 
-    private boolean validateEmail(){
-        if(ev_email.getText().toString().isEmpty()){
+    private boolean validateEmail() {
+        String email = ev_email.getText().toString().trim();
+        if (email.isEmpty()) {
             ev_email.setError("Field cannot be empty");
             return false;
-        }
-        else if(!(ev_email.getText().toString().contains("@"))){
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             ev_email.setError("Invalid Email address");
             return false;
         }
         return true;
     }
 
-    private boolean validateName(){
-        if(ev_name.getText().toString().isEmpty()){
+    private boolean validateName() {
+        if (ev_name.getText().toString().trim().isEmpty()) {
             ev_name.setError("Field cannot be empty");
             return false;
-        }else{
-            return true;
         }
+        return true;
     }
 
-    private boolean validatePhone(){
-        if(ev_phoneNo.getText().toString().isEmpty()){
+    private boolean validatePhone() {
+        if (ev_phoneNo.getText().toString().trim().isEmpty()) {
             ev_phoneNo.setError("Field cannot be empty");
             return false;
-        }else{
-            return true;
         }
+        return true;
     }
 
-    private boolean validatePass(){
-        if(ev_re_password.getText().toString().isEmpty()){
-            ev_re_password.setError("Field cannot be empty");
-            return false;
-        }else{
-            return true;
-        }
-    }
-
-    private boolean validateRepass(){
-        if(!(ev_password.getText().toString().equals(ev_re_password.getText().toString()))){
-            ev_re_password.setError("Reentered Password does not match");
-            ev_re_password.setText("");
-            ev_password.setText("");
-            return false;
-        }else if(ev_password.getText().toString().isEmpty()){
+    private boolean validatePass() {
+        if (ev_password.getText().toString().isEmpty()) {
             ev_password.setError("Field cannot be empty");
             return false;
         }
         return true;
     }
 
-
-
+    private boolean validateRepass() {
+        String pass = ev_password.getText().toString();
+        String rePass = ev_re_password.getText().toString();
+        if (rePass.isEmpty()) {
+            ev_re_password.setError("Field cannot be empty");
+            return false;
+        } else if (!pass.equals(rePass)) {
+            ev_re_password.setError("Passwords do not match");
+            return false;
+        }
+        return true;
+    }
 }

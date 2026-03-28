@@ -30,7 +30,6 @@ import java.util.Objects;
 public class LearnOn_Main extends AppCompatActivity {
 
     public static ArrayList<Learn> Llist = new ArrayList<>();
-    Fragment fragment = new LearnOn_List();
     BottomNavigationView bottomNavigationView;
 
     @Override
@@ -38,27 +37,20 @@ public class LearnOn_Main extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_on_main);
 
-        // Populate Dummy Data to avoid empty list crash/blank screen
-        if(Llist.isEmpty()) {
-            // Updated constructor calls to match Learn class: 
-            // id, title, description, type, mode, duration, price
-            Llist.add(new Learn("1", "Parenting", "Learn basics of parenting", "Paid", "Online", "4 Weeks", "1000"));
-            Llist.add(new Learn("2", "Child Care", "Learn basics of child care", "Free", "Offline", "2 Days", "0"));
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.LearnOnMain_Frame, new LearnOn_List()).commit();
         }
-
-        getSupportFragmentManager().beginTransaction().replace(R.id.LearnOnMain_Frame, fragment).commit();
 
         bottomNavigationView=findViewById(R.id.bottom_navigation_learn);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.allCourse) {
-                // You Just Attach Here Fragment Manager Here Of All Course
-                // getSupportFragmentManager().beginTransaction().replace(R.id.LearnOnMain_Frame, fragment).commit();
-                Toast.makeText(getApplicationContext(), "All Course", Toast.LENGTH_SHORT).show();
+                getSupportFragmentManager().beginTransaction().replace(R.id.LearnOnMain_Frame, new LearnOn_List()).commit();
+                return true;
             } else if (itemId == R.id.myCourse) {
-                // You just Attach Here Fragment Manager Here Of My Course
-                // getSupportFragmentManager().beginTransaction().replace(R.id.LearnOnMain_Frame, fragment).commit();
-                Toast.makeText(getApplicationContext(), "My Course", Toast.LENGTH_SHORT).show();
+                // Placeholder for My Courses - typically filtered list or separate fragment
+                Toast.makeText(getApplicationContext(), "My Courses feature coming soon!", Toast.LENGTH_SHORT).show();
+                return true;
             }
             return false;
         });

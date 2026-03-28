@@ -1,10 +1,12 @@
 package com.spacECE.spaceceedu;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
@@ -40,17 +42,31 @@ public class ActivityAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         if(convertView == null)
-            convertView = LayoutInflater.from(context).inflate(R.layout.activity_item,parent,false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.item_activity_card,parent,false);
 
         ActivityData currActivityData = (ActivityData) getItem(position);
-        List<Data> dataList = currActivityData.getData();
-        TextView textViewActivityId,textViewActivityTitle;
+        
+        TextView textViewActivityId = convertView.findViewById(R.id.text_activity_id);
+        TextView textViewActivityTitle = convertView.findViewById(R.id.text_activity_title);
+        Button btnView = convertView.findViewById(R.id.btn_view);
 
-        //textViewActivityId = convertView.findViewById(R.id.text_activity_id);
-        textViewActivityTitle = convertView.findViewById(R.id.text_activity_title);
+        if (currActivityData.getData() != null && !currActivityData.getData().isEmpty()) {
+            Data data = currActivityData.getData().get(0);
+            if (textViewActivityId != null) {
+                textViewActivityId.setText("Activity ID : " + data.getActivityNo());
+            }
+            if (textViewActivityTitle != null) {
+                textViewActivityTitle.setText("Activity Name : " + data.getActivityName());
+            }
+        }
 
-        //textViewActivityId.setText(currActivityData.getData().get(0).getActivityNo().toString());
-        textViewActivityTitle.setText(currActivityData.getData().get(0).getActivityName().toString());
+        if (btnView != null) {
+            btnView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, ActivityDetailsActivity.class);
+                intent.putExtra("EXTRA_ACTIVITY", currActivityData);
+                context.startActivity(intent);
+            });
+        }
 
         return convertView;
     }

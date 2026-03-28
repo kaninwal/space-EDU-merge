@@ -1,11 +1,13 @@
 package com.spacECE.spaceceedu.LibForSmall;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.spacECE.spaceceedu.R;
 
 import java.util.ArrayList;
@@ -15,26 +17,37 @@ public class Library_main extends AppCompatActivity {
     public static ArrayList<books> list = new ArrayList<>();
 
     BottomNavigationView bottomNavigationView;
+    FloatingActionButton fabAddBook;
 
-    Allbooks_fragment allbooks_fragment = new Allbooks_fragment();
-    Mybooks_fragment mybooks_fragment = new Mybooks_fragment();
+    Fragment allbooks_fragment = new library_list();
+    Fragment mybooks_fragment = new library_myBooks_list();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library_main);
 
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        getSupportFragmentManager().beginTransaction().replace(R.id.container,allbooks_fragment).commit();
+        bottomNavigationView = findViewById(R.id.bottomAppBar);
+        fabAddBook = findViewById(R.id.floatingActionBtnBottom);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.book_framelayout, allbooks_fragment).commit();
+        }
+
+        fabAddBook.setOnClickListener(v -> {
+            Intent intent = new Intent(Library_main.this, AddBook.class);
+            startActivity(intent);
+        });
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.allbooks) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, allbooks_fragment).commit();
+            if (itemId == R.id.menuHome) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.book_framelayout, allbooks_fragment).commit();
                 return true;
-            } else if (itemId == R.id.mybooks) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, mybooks_fragment).commit();
+            } else if (itemId == R.id.menuBook) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.book_framelayout, mybooks_fragment).commit();
                 return true;
-            } else if (itemId == R.id.chat) {
+            } else if (itemId == R.id.menuChat) {
                 startActivity(new Intent(getApplicationContext(), ChatUS.class));
                 overridePendingTransition(0, 0);
                 return true;

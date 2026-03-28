@@ -3,27 +3,69 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_baseline_home_24_custom"
             android:title="Home" />
-
-        <item
-            android:id="@+id/nav_about"
-            android:icon="@drawable/ic_baseline_info_24_custom"
-            android:title="About Us" />
-
-        <item
-            android:id="@+id/nav_help"
-            android:icon="@drawable/ic_baseline_lock_24_custom"
-            android:title="Privacy &amp; Help" />
-
-        <item
-            android:id="@+id/nav_settings"
-            android:icon="@drawable/ic_baseline_settings_24_custom"
-            android:title="Settings" />
     </group>
+
+    <item android:title="About &amp; Social">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_about"
+                    android:icon="@drawable/ic_baseline_info_24_custom"
+                    android:title="About Us" />
+                <item
+                    android:id="@+id/nav_terms"
+                    android:icon="@drawable/ic_baseline_info_24_custom"
+                    android:title="Terms and Conditions" />
+                <item
+                    android:id="@+id/nav_privacy"
+                    android:icon="@drawable/ic_baseline_lock_24_custom"
+                    android:title="Privacy Policy" />
+            </group>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_instagram"
+                    android:icon="@android:drawable/ic_menu_share"
+                    android:title="Instagram" />
+                <item
+                    android:id="@+id/nav_youtube"
+                    android:icon="@android:drawable/ic_menu_share"
+                    android:title="YouTube" />
+                <item
+                    android:id="@+id/nav_facebook"
+                    android:icon="@android:drawable/ic_menu_share"
+                    android:title="Facebook" />
+                <item
+                    android:id="@+id/nav_linkedin"
+                    android:icon="@android:drawable/ic_menu_share"
+                    android:title="LinkedIn" />
+                <item
+                    android:id="@+id/nav_twitter"
+                    android:icon="@android:drawable/ic_menu_share"
+                    android:title="Twitter" />
+            </group>
+        </menu>
+    </item>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_contact"
+                android:icon="@android:drawable/ic_dialog_email"
+                android:title="Contact Us" />
+            <item
+                android:id="@+id/nav_rate"
+                android:icon="@android:drawable/btn_star"
+                android:title="Rate Us" />
+            <item
+                android:id="@+id/nav_location"
+                android:icon="@android:drawable/ic_menu_mapmode"
+                android:title="Our Location" />
+        </menu>
+    </item>
 
 </menu>

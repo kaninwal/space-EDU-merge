@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".ConsultUS.Consultant_Main">
 
     <FrameLayout
@@ -18,9 +19,9 @@
         android:id="@+id/Consultant_Main_BottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:itemIconTint="@color/Spacece_Yellow"
-        app:itemTextColor="@color/Spacece_Yellow"
+        android:background="@color/Spacece_Yellow"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
         app:menu="@menu/consultant_main_user_bottomnav" />
 
 </LinearLayout>

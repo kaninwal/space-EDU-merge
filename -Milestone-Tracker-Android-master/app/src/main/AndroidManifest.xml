@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application>
+        <activity
+            android:name=".ui.activity.StartupActivity"
+            android:theme="@style/SplashScreenTheme"
+            android:configChanges="locale|uiMode|colorMode"
+            android:exported="true" />
+        <activity
+            android:name=".ui.activity.SelectRoleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.SignupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.ResetPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.ParentMainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.AdminMainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.WebViewActivity"
+            android:hardwareAccelerated="true"
+            android:exported="false" />
+    </application>
+</manifest>
